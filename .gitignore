@@ -5,3 +5,5 @@
 *out/
 *classes/
 *.iws
+dist
+**/*.swp

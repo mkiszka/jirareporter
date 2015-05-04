@@ -146,18 +146,6 @@
     </autodetection-disabled>
   </component>
   <component name="IdProvider" IDEtalkID="295ECF4BACA29968FFDC885420AD7516" />
-  <component name="InspectionProjectProfileManager">
-    <profiles>
-      <profile version="1.0" is_locked="false">
-        <option name="myName" value="Project Default" />
-        <option name="myLocal" value="false" />
-        <inspection_tool class="UnusedImport" enabled="true" level="ERROR" enabled_by_default="true" />
-      </profile>
-    </profiles>
-    <option name="PROJECT_PROFILE" value="Project Default" />
-    <option name="USE_PROJECT_PROFILE" value="true" />
-    <version value="1.0" />
-  </component>
   <component name="JavadocGenerationManager">
     <option name="OUTPUT_DIRECTORY" />
     <option name="OPTION_SCOPE" value="protected" />
@@ -304,203 +292,245 @@
         </XML>
         <codeStyleSettings language="JAVA">
           <arrangement>
-            <groups>
-              <group>
-                <type>GETTERS_AND_SETTERS</type>
-                <order>KEEP</order>
-              </group>
-            </groups>
             <rules>
-              <rule>
-                <match>
-                  <AND>
+              <section>
+                <rule>
+                  <match>
+                    <AND>
+                      <FIELD />
+                      <FINAL />
+                      <PUBLIC />
+                      <STATIC />
+                    </AND>
+                  </match>
+                </rule>
+              </section>
+              <section>
+                <rule>
+                  <match>
+                    <AND>
+                      <FIELD />
+                      <FINAL />
+                      <PROTECTED />
+                      <STATIC />
+                    </AND>
+                  </match>
+                </rule>
+              </section>
+              <section>
+                <rule>
+                  <match>
+                    <AND>
+                      <FIELD />
+                      <FINAL />
+                      <PACKAGE_PRIVATE />
+                      <STATIC />
+                    </AND>
+                  </match>
+                </rule>
+              </section>
+              <section>
+                <rule>
+                  <match>
+                    <AND>
+                      <FIELD />
+                      <FINAL />
+                      <PRIVATE />
+                      <STATIC />
+                    </AND>
+                  </match>
+                </rule>
+              </section>
+              <section>
+                <rule>
+                  <match>
+                    <AND>
+                      <FIELD />
+                      <PUBLIC />
+                      <STATIC />
+                    </AND>
+                  </match>
+                </rule>
+              </section>
+              <section>
+                <rule>
+                  <match>
+                    <AND>
+                      <FIELD />
+                      <PROTECTED />
+                      <STATIC />
+                    </AND>
+                  </match>
+                </rule>
+              </section>
+              <section>
+                <rule>
+                  <match>
+                    <AND>
+                      <FIELD />
+                      <PACKAGE_PRIVATE />
+                      <STATIC />
+                    </AND>
+                  </match>
+                </rule>
+              </section>
+              <section>
+                <rule>
+                  <match>
+                    <AND>
+                      <FIELD />
+                      <PRIVATE />
+                      <STATIC />
+                    </AND>
+                  </match>
+                </rule>
+              </section>
+              <section>
+                <rule>
+                  <match>
+                    <AND>
+                      <FIELD />
+                      <FINAL />
+                      <PUBLIC />
+                    </AND>
+                  </match>
+                </rule>
+              </section>
+              <section>
+                <rule>
+                  <match>
+                    <AND>
+                      <FIELD />
+                      <FINAL />
+                      <PROTECTED />
+                    </AND>
+                  </match>
+                </rule>
+              </section>
+              <section>
+                <rule>
+                  <match>
+                    <AND>
+                      <FIELD />
+                      <FINAL />
+                      <PACKAGE_PRIVATE />
+                    </AND>
+                  </match>
+                </rule>
+              </section>
+              <section>
+                <rule>
+                  <match>
+                    <AND>
+                      <FIELD />
+                      <FINAL />
+                      <PRIVATE />
+                    </AND>
+                  </match>
+                </rule>
+              </section>
+              <section>
+                <rule>
+                  <match>
+                    <AND>
+                      <FIELD />
+                      <PUBLIC />
+                    </AND>
+                  </match>
+                </rule>
+              </section>
+              <section>
+                <rule>
+                  <match>
+                    <AND>
+                      <FIELD />
+                      <PROTECTED />
+                    </AND>
+                  </match>
+                </rule>
+              </section>
+              <section>
+                <rule>
+                  <match>
+                    <AND>
+                      <FIELD />
+                      <PACKAGE_PRIVATE />
+                    </AND>
+                  </match>
+                </rule>
+              </section>
+              <section>
+                <rule>
+                  <match>
+                    <AND>
+                      <FIELD />
+                      <PRIVATE />
+                    </AND>
+                  </match>
+                </rule>
+              </section>
+              <section>
+                <rule>
+                  <match>
                     <FIELD />
-                    <FINAL />
-                    <PUBLIC />
-                    <STATIC />
-                  </AND>
-                </match>
-              </rule>
-              <rule>
-                <match>
-                  <AND>
-                    <FIELD />
-                    <FINAL />
-                    <PROTECTED />
-                    <STATIC />
-                  </AND>
-                </match>
-              </rule>
-              <rule>
-                <match>
-                  <AND>
-                    <FIELD />
-                    <FINAL />
-                    <PACKAGE_PRIVATE />
-                    <STATIC />
-                  </AND>
-                </match>
-              </rule>
-              <rule>
-                <match>
-                  <AND>
-                    <FIELD />
-                    <FINAL />
-                    <PRIVATE />
-                    <STATIC />
-                  </AND>
-                </match>
-              </rule>
-              <rule>
-                <match>
-                  <AND>
-                    <FIELD />
-                    <PUBLIC />
-                    <STATIC />
-                  </AND>
-                </match>
-              </rule>
-              <rule>
-                <match>
-                  <AND>
-                    <FIELD />
-                    <PROTECTED />
-                    <STATIC />
-                  </AND>
-                </match>
-              </rule>
-              <rule>
-                <match>
-                  <AND>
-                    <FIELD />
-                    <PACKAGE_PRIVATE />
-                    <STATIC />
-                  </AND>
-                </match>
-              </rule>
-              <rule>
-                <match>
-                  <AND>
-                    <FIELD />
-                    <PRIVATE />
-                    <STATIC />
-                  </AND>
-                </match>
-              </rule>
-              <rule>
-                <match>
-                  <AND>
-                    <FIELD />
-                    <FINAL />
-                    <PUBLIC />
-                  </AND>
-                </match>
-              </rule>
-              <rule>
-                <match>
-                  <AND>
-                    <FIELD />
-                    <FINAL />
-                    <PROTECTED />
-                  </AND>
-                </match>
-              </rule>
-              <rule>
-                <match>
-                  <AND>
-                    <FIELD />
-                    <FINAL />
-                    <PACKAGE_PRIVATE />
-                  </AND>
-                </match>
-              </rule>
-              <rule>
-                <match>
-                  <AND>
-                    <FIELD />
-                    <FINAL />
-                    <PRIVATE />
-                  </AND>
-                </match>
-              </rule>
-              <rule>
-                <match>
-                  <AND>
-                    <FIELD />
-                    <PUBLIC />
-                  </AND>
-                </match>
-              </rule>
-              <rule>
-                <match>
-                  <AND>
-                    <FIELD />
-                    <PROTECTED />
-                  </AND>
-                </match>
-              </rule>
-              <rule>
-                <match>
-                  <AND>
-                    <FIELD />
-                    <PACKAGE_PRIVATE />
-                  </AND>
-                </match>
-              </rule>
-              <rule>
-                <match>
-                  <AND>
-                    <FIELD />
-                    <PRIVATE />
-                  </AND>
-                </match>
-              </rule>
-              <rule>
-                <match>
-                  <FIELD />
-                </match>
-              </rule>
-              <rule>
-                <match>
-                  <CONSTRUCTOR />
-                </match>
-              </rule>
-              <rule>
-                <match>
-                  <AND>
+                  </match>
+                </rule>
+              </section>
+              <section>
+                <rule>
+                  <match>
+                    <CONSTRUCTOR />
+                  </match>
+                </rule>
+              </section>
+              <section>
+                <rule>
+                  <match>
+                    <AND>
+                      <METHOD />
+                      <STATIC />
+                    </AND>
+                  </match>
+                </rule>
+              </section>
+              <section>
+                <rule>
+                  <match>
                     <METHOD />
-                    <STATIC />
-                  </AND>
-                </match>
-              </rule>
-              <rule>
-                <match>
-                  <METHOD />
-                </match>
-              </rule>
-              <rule>
-                <match>
-                  <ENUM />
-                </match>
-              </rule>
-              <rule>
-                <match>
-                  <INTERFACE />
-                </match>
-              </rule>
-              <rule>
-                <match>
-                  <AND>
+                  </match>
+                </rule>
+              </section>
+              <section>
+                <rule>
+                  <match>
+                    <ENUM />
+                  </match>
+                </rule>
+              </section>
+              <section>
+                <rule>
+                  <match>
+                    <INTERFACE />
+                  </match>
+                </rule>
+              </section>
+              <section>
+                <rule>
+                  <match>
+                    <AND>
+                      <CLASS />
+                      <STATIC />
+                    </AND>
+                  </match>
+                </rule>
+              </section>
+              <section>
+                <rule>
+                  <match>
                     <CLASS />
-                    <STATIC />
-                  </AND>
-                </match>
-              </rule>
-              <rule>
-                <match>
-                  <CLASS />
-                </match>
-              </rule>
+                  </match>
+                </rule>
+              </section>
             </rules>
           </arrangement>
         </codeStyleSettings>
@@ -525,7 +555,7 @@
       <module fileurl="file://$PROJECT_DIR$/root.iml" filepath="$PROJECT_DIR$/root.iml" />
     </modules>
   </component>
-  <component name="ProjectRootManager" version="2" languageLevel="JDK_1_6" assert-keyword="true" jdk-15="true" project-jdk-name="1.7" project-jdk-type="JavaSDK">
+  <component name="ProjectRootManager" version="2" languageLevel="JDK_1_6" default="false" assert-keyword="true" jdk-15="true" project-jdk-name="1.8" project-jdk-type="JavaSDK">
     <output url="file://$PROJECT_DIR$/out" />
   </component>
   <component name="ProjectRunConfigurationManager">
@@ -643,62 +673,61 @@
     </library>
     <library name="TeamCity Open API agent">
       <CLASSES>
-        <root url="jar://$TeamCityDistribution$/devPackage/agent-api.jar!/" />
+        <root url="jar://$PROJECT_DIR$/TeamCity/devPackage/agent-api.jar!/" />
       </CLASSES>
       <JAVADOC>
-        <root url="jar://$TeamCityDistribution$/devPackage/javadoc/openApi-help.jar!/" />
+        <root url="jar://$PROJECT_DIR$/TeamCity/devPackage/javadoc/openApi-help.jar!/" />
       </JAVADOC>
       <SOURCES>
-        <root url="jar://$TeamCityDistribution$/devPackage/src/openApi-source.jar!/" />
+        <root url="jar://$PROJECT_DIR$/TeamCity/devPackage/src/openApi-source.jar!/" />
       </SOURCES>
     </library>
     <library name="TeamCity Open API common">
       <CLASSES>
-        <root url="jar://$TeamCityDistribution$/devPackage/common-api.jar!/" />
-        <root url="jar://$TeamCityDistribution$/devPackage/runtime/runtime-util.jar!/" />
+        <root url="jar://$PROJECT_DIR$/TeamCity/devPackage/common-api.jar!/" />
+        <root url="jar://$PROJECT_DIR$/TeamCity/devPackage/runtime/runtime-util.jar!/" />
       </CLASSES>
       <JAVADOC>
-        <root url="jar://$TeamCityDistribution$/devPackage/javadoc/openApi-help.jar!/" />
+        <root url="jar://$PROJECT_DIR$/TeamCity/devPackage/javadoc/openApi-help.jar!/" />
       </JAVADOC>
       <SOURCES>
-        <root url="jar://$TeamCityDistribution$/devPackage/src/openApi-source.jar!/" />
+        <root url="jar://$PROJECT_DIR$/TeamCity/devPackage/src/openApi-source.jar!/" />
       </SOURCES>
     </library>
     <library name="TeamCity Open API server">
       <CLASSES>
-        <root url="jar://$TeamCityDistribution$/devPackage/server-api.jar!/" />
+        <root url="jar://$PROJECT_DIR$/TeamCity/devPackage/server-api.jar!/" />
       </CLASSES>
       <JAVADOC>
-        <root url="jar://$TeamCityDistribution$/devPackage/javadoc/openApi-help.jar!/" />
+        <root url="jar://$PROJECT_DIR$/TeamCity/devPackage/javadoc/openApi-help.jar!/" />
       </JAVADOC>
       <SOURCES>
-        <root url="jar://$TeamCityDistribution$/devPackage/src/openApi-source.jar!/" />
+        <root url="jar://$PROJECT_DIR$/TeamCity/devPackage/src/openApi-source.jar!/" />
       </SOURCES>
     </library>
     <library name="TeamCity Third-Party common">
       <CLASSES>
-        <root url="jar://$TeamCityDistribution$/webapps/ROOT/WEB-INF/lib/annotations.jar!/" />
-        <root url="jar://$TeamCityDistribution$/webapps/ROOT/WEB-INF/lib/spring.jar!/" />
-        <root url="jar://$TeamCityDistribution$/webapps/ROOT/WEB-INF/lib/openapi.jar!/" />
-        <root url="jar://$TeamCityDistribution$/webapps/ROOT/WEB-INF/lib/util.jar!/" />
+        <root url="jar://$PROJECT_DIR$/TeamCity/webapps/ROOT/WEB-INF/lib/annotations.jar!/" />
+        <root url="jar://$PROJECT_DIR$/TeamCity/webapps/ROOT/WEB-INF/lib/spring.jar!/" />
+        <root url="jar://$PROJECT_DIR$/TeamCity/webapps/ROOT/WEB-INF/lib/openapi.jar!/" />
+        <root url="jar://$PROJECT_DIR$/TeamCity/webapps/ROOT/WEB-INF/lib/util.jar!/" />
       </CLASSES>
       <JAVADOC />
       <SOURCES />
     </library>
     <library name="TeamCity Third-Party server">
       <CLASSES>
-        <root url="jar://$TeamCityDistribution$/webapps/ROOT/WEB-INF/lib/spring-webmvc.jar!/" />
+        <root url="jar://$PROJECT_DIR$/TeamCity/webapps/ROOT/WEB-INF/lib/spring-webmvc.jar!/" />
       </CLASSES>
       <JAVADOC />
       <SOURCES />
     </library>
     <library name="Tomcat">
       <CLASSES>
-        <root url="jar://$TeamCityDistribution$/lib/servlet-api.jar!/" />
+        <root url="jar://$PROJECT_DIR$/TeamCity/lib/servlet-api.jar!/" />
       </CLASSES>
       <JAVADOC />
       <SOURCES />
     </library>
   </component>
 </project>
-
