@@ -16,9 +16,9 @@
 
     <files>
         <file>
-            <source>${project.basedir}/agent/target/jirareporter-agent-bin.zip</source>
+            <source>${project.basedir}/agent/target/jirareporter.zip</source>
             <outputDirectory>/agent</outputDirectory>
-            <destName>jirareporter-agent.zip</destName>
+            <destName>jirareporter.zip</destName>
         </file>
         <file>
             <source>${project.basedir}/target/extra-resources/teamcity-plugin.xml</source>

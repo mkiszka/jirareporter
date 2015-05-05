@@ -6,21 +6,20 @@
     <formats>
         <format>dir</format>
     </formats>
+    <!--
     <dependencySets>
         <dependencySet>
             <outputDirectory>/</outputDirectory>
-            <useProjectArtifact>true</useProjectArtifact>
+            <useProjectArtifact>false</useProjectArtifact>
             <unpack>false</unpack>
             <scope>runtime</scope>
         </dependencySet>
     </dependencySets>
-    <fileSets>
-        <fileSet>
-            <directory>${project.build.outputDirectory}</directory>
+    -->
+    <files>
+        <file>
+            <source>target/jirareporter.jar</source>
             <outputDirectory>/</outputDirectory>
-            <includes>
-                <include>*.jar</include>
-            </includes>
-        </fileSet>
-    </fileSets>
+        </file>
+    </files>
 </assembly>

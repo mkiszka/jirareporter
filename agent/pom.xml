@@ -81,7 +81,7 @@
                 <artifactId>maven-assembly-plugin</artifactId>
                 <configuration>
                     <descriptor>src/assembly/bin.xml</descriptor>
-                    <finalName>jirareporter-agent</finalName>
+                    <finalName>jirareporter</finalName>
                 </configuration>
                 <executions>
                     <execution>
