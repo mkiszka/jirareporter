@@ -4,7 +4,7 @@
   <info>
     <name>jirareporter</name>
     <display-name>jirareporter</display-name>
-    <version>@version@</version>
+    <version>${plugin.version}</version>
   </info>
   <deployment use-separate-classloader="false"/>
 </teamcity-plugin>
