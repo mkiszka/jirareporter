@@ -1,8 +1,7 @@
 Plug-in is designed for sending build results from TeamCity in JIRA ticket and it is also possible to move the issue through your workflow. Report are sent as comments to the issue.
 
-[Download plugin (6.1 Mb)](https://bitbucket.org/mamirov/jirareporter/downloads/jirareporter.zip)
-[Source code](https://github.com/mamirov/jirareporter)
-[Release notes](https://github.com/mamirov/jirareporter/wiki/Release-Notes)
+[Download plugin](https://github.com/Myra-Security-GmbH/jirareporter/releases)
+[Source code](https://github.com/Myra-Security-GmbH/jirareporter)
 
 ## The advantages
 
