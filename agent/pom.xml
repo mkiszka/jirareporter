@@ -26,7 +26,7 @@
         <repository>
             <id>atlassian-public</id>
             <name>Atlassian repo</name>
-            <url>https://m2proxy.atlassian.com/repository/public</url>
+            <url>https://maven.atlassian.com/repository/public</url>
             <snapshots>
                 <enabled>true</enabled>
                 <updatePolicy>daily</updatePolicy>
@@ -40,8 +40,9 @@
     </repositories>    
 
     <properties>
-        <jira.restapi.version>1.0</jira.restapi.version>
-        <teamcity.version>9.0.3</teamcity.version>
+        <jira.restapi.version>2.0.0-m2</jira.restapi.version>
+        <logback.version>1.1.7</logback.version>
+        <teamcity.version>9.1.6</teamcity.version>
     </properties>
 
     <dependencies>
@@ -61,6 +62,37 @@
             <groupId>com.atlassian.jira</groupId>
             <artifactId>jira-rest-java-client</artifactId>
             <version>${jira.restapi.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>com.atlassian.httpclient</groupId>
+                    <artifactId>atlassian-httpclient-apache-httpcomponents</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>com.atlassian.httpclient</groupId>
+            <artifactId>atlassian-httpclient-apache-httpcomponents</artifactId>
+            <version>0.15.0</version>
+        </dependency>
+        <dependency>
+            <groupId>com.atlassian.sal</groupId>
+            <artifactId>sal-api</artifactId>
+            <version>3.0.6</version>
+        </dependency>
+        <dependency>
+            <groupId>com.atlassian.event</groupId>
+            <artifactId>atlassian-event</artifactId>
+            <version>3.0.0</version>
+        </dependency>
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-core</artifactId>
+            <version>${logback.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-classic</artifactId>
+            <version>${logback.version}</version>
         </dependency>
    </dependencies>
 
@@ -70,6 +102,7 @@
         <plugins>
             <plugin>
                 <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.3</version>
                 <configuration>
                     <source>${maven.compiler.source}</source>
                     <target>${maven.compiler.target}</target>

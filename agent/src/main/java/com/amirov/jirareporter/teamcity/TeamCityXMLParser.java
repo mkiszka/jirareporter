@@ -3,6 +3,8 @@ package com.amirov.jirareporter.teamcity;
 
 import com.amirov.jirareporter.RunnerParamsProvider;
 import com.google.common.collect.ImmutableMap;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.NodeList;
@@ -16,6 +18,8 @@ import java.net.URLConnection;
 import java.util.Map;
 
 public class TeamCityXMLParser {
+    private static final Logger logger = LoggerFactory.getLogger(TeamCityXMLParser.class);
+
     private String SERVER_URL = RunnerParamsProvider.getTCServerUrl();
     private String userPassword = RunnerParamsProvider.getTCUser()+":"+ RunnerParamsProvider.getTCPassword();
     private NamedNodeMap buildData;
@@ -28,7 +32,12 @@ public class TeamCityXMLParser {
 
     private NodeList getNodeList(String xmlUrl, String tag) {
         try{
+            System.out.println("*****************************************************************************");
+            logger.error("xmlUrl=" + xmlUrl);
+            logger.info("tag=" + tag);
             URL url = new URL(xmlUrl);
+            logger.info("url=" + url);
+            logger.info("userPassword=" + userPassword);
             String encoding = new BASE64Encoder().encode(userPassword.getBytes());
             URLConnection uc = url.openConnection();
             uc.setRequestProperty("Authorization","Basic " + encoding);
@@ -37,6 +46,7 @@ public class TeamCityXMLParser {
             DocumentBuilder db = dbf.newDocumentBuilder();
             Document doc = db.parse(new InputSource(uc.getInputStream()));
             doc.getDocumentElement().normalize();
+            logger.info("doc=" + doc);
             return doc.getElementsByTagName(tag);
 //            return nodeList.item(num);
         } catch (Exception e) {

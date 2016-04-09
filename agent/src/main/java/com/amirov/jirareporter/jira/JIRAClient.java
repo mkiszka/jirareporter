@@ -4,12 +4,12 @@ import com.amirov.jirareporter.Reporter;
 import com.amirov.jirareporter.RunnerParamsProvider;
 import com.amirov.jirareporter.teamcity.TeamCityXMLParser;
 import com.atlassian.jira.rest.client.JiraRestClient;
-import com.atlassian.jira.rest.client.NullProgressMonitor;
 import com.atlassian.jira.rest.client.domain.Comment;
 import com.atlassian.jira.rest.client.domain.Issue;
 import com.atlassian.jira.rest.client.domain.Transition;
 import com.atlassian.jira.rest.client.domain.input.TransitionInput;
-import com.atlassian.jira.rest.client.internal.jersey.JerseyJiraRestClientFactory;
+import com.atlassian.jira.rest.client.internal.async.AsynchronousJiraRestClientFactory;
+import com.atlassian.util.concurrent.Promise;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -18,7 +18,7 @@ public class JIRAClient {
 
     public static JiraRestClient getRestClient() {
         System.setProperty("jsse.enableSNIExtension", RunnerParamsProvider.sslConnectionIsEnabled());
-        JerseyJiraRestClientFactory factory = new JerseyJiraRestClientFactory();
+        AsynchronousJiraRestClientFactory factory = new AsynchronousJiraRestClientFactory();
         URI jiraServerUri = null;
         try {
             jiraServerUri = new URI(RunnerParamsProvider.getJiraServerUrl());
@@ -29,14 +29,13 @@ public class JIRAClient {
     }
 
     public static Issue getIssue() {
-        NullProgressMonitor pm = new NullProgressMonitor();
-        Issue issue = null;
+        Promise<Issue> issue = null;
         try {
-            issue = getRestClient().getIssueClient().getIssue(Reporter.getIssueId(), pm);
+            issue = getRestClient().getIssueClient().getIssue(Reporter.getIssueId());
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return issue;
+        return issue.claim();
     }
 
     public static String getIssueStatus(){
@@ -44,7 +43,7 @@ public class JIRAClient {
     }
 
     private static Iterable<Transition> getTransitions (){
-        return getRestClient().getIssueClient().getTransitions(getIssue().getTransitionsUri(), new NullProgressMonitor());
+        return getRestClient().getIssueClient().getTransitions(getIssue().getTransitionsUri()).claim();
     }
 
     private static Transition getTransition(String transitionName){

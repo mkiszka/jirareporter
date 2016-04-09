@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright (c) 2013, Stormpath, Inc.
+  ~ All rights reserved.
+  -->
+
+<configuration>
+    <!-- Send debug messages to System.out -->
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <!-- By default, encoders are assigned the type ch.qos.logback.classic.encoder.PatternLayoutEncoder -->
+        <encoder>
+            <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{5} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <appender name="outputLog" class="ch.qos.logback.core.FileAppender">
+        <file>jirareporter.log</file>
+        <encoder>
+            <pattern>%d{"yyyy-MM-dd'T'HH:mm:ss.SSS'Z'",UTC} %-5level [%thread] %logger{36} %m%n</pattern>
+        </encoder>
+    </appender>
+    <root level="WARN">
+        <appender-ref ref="outputLog"/>
+    </root>
+    <logger name="com.amirov.jirareporter.teamcity.TeamCityXMLParser" level="DEBUG">
+        <appender-ref ref="STDOUT"/>
+        <appender-ref ref="outputLog"/>
+    </logger>
+</configuration>

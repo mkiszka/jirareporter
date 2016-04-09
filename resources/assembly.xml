@@ -26,6 +26,11 @@
             <outputDirectory>/</outputDirectory>
             <destName>teamcity-plugin.xml</destName>
         </file>
+        <file>
+            <source>${project.basedir}/target/extra-resources/logback.xml</source>
+            <outputDirectory>/agent</outputDirectory>
+            <destName>logback.xml</destName>
+        </file>
     </files>
 
     <fileSets>
