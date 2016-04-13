@@ -7,6 +7,7 @@ import com.atlassian.jira.rest.client.JiraRestClient;
 import com.atlassian.jira.rest.client.NullProgressMonitor;
 import com.atlassian.jira.rest.client.domain.Comment;
 import com.atlassian.jira.rest.client.domain.Issue;
+import com.atlassian.jira.rest.client.domain.Resolution;
 import com.atlassian.jira.rest.client.domain.Transition;
 import com.atlassian.jira.rest.client.domain.input.TransitionInput;
 import com.atlassian.jira.rest.client.internal.jersey.JerseyJiraRestClientFactory;
@@ -60,6 +61,25 @@ public class JIRAClient {
         for (Transition transition : transitions) {
             if (transition.getName().equals(transitionName)) {
                 return transition;
+            }
+        }
+        return null;
+    }
+
+    public static Transition getTransitionByName(String transitionName) {
+        Iterable<Transition> transitions = getTransitions();
+        return getTransitionByName(transitions, transitionName);
+    }
+
+    private static Iterable<Resolution> getResolutions() {
+        return getRestClient().getMetadataClient().getResolutions(new NullProgressMonitor());
+    }
+
+    public static Resolution getResolutionByName(String resolutionName) {
+        Iterable<Resolution> resolutions = getResolutions();
+        for (Resolution resolution : resolutions) {
+            if (resolution.getName().equals(resolutionName)) {
+                return resolution;
             }
         }
         return null;

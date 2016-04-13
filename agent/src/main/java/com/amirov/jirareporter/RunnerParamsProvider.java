@@ -6,6 +6,7 @@ import com.amirov.jirareporter.teamcity.TeamCityXMLParser;
 
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.util.Map;
 import java.util.Properties;
 
 public  class RunnerParamsProvider {
@@ -17,6 +18,12 @@ public  class RunnerParamsProvider {
             fis.close();
         } catch (Exception e) {
             e.printStackTrace();
+        }
+    }
+
+    public static void printProperties() {
+        for (Map.Entry<Object, Object> entry : props.entrySet()) {
+            System.out.println(entry.getKey() + ":" + entry.getValue());
         }
     }
 

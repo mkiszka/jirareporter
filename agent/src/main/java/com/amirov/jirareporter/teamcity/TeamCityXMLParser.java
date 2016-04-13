@@ -2,15 +2,18 @@ package com.amirov.jirareporter.teamcity;
 
 
 import com.amirov.jirareporter.RunnerParamsProvider;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableMap;
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
+import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 import sun.misc.BASE64Encoder;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
+import java.io.IOException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.Map;
@@ -20,7 +23,8 @@ public class TeamCityXMLParser {
     private String userPassword = RunnerParamsProvider.getTCUser()+":"+ RunnerParamsProvider.getTCPassword();
     private NamedNodeMap buildData;
     public String buildTypeId = RunnerParamsProvider.getBuildTypeId();
-    
+    private static final ObjectMapper mapper = new ObjectMapper();
+
     public TeamCityXMLParser(){
         String BUILDS_XML_URL = "/httpAuth/app/rest/builds?locator=branch:default:any,running:true,buildType:";
         buildData = parseXML(SERVER_URL+ BUILDS_XML_URL +buildTypeId, "build");
@@ -51,7 +55,40 @@ public class TeamCityXMLParser {
     }
 
     private String getBuildAttribute(String attribute){
+//        System.out.println("^^^^^^^^^^^^^^^^^^^^^^^^");
+//        printNodeMap(buildData);
+//        System.out.println("^^^^^^^^^^^^^^^^^^^^^^^^");
         return buildData.getNamedItem(attribute).getNodeValue();
+
+    }
+
+    private void printNodeMap(NamedNodeMap nodeMap) {
+        int length = nodeMap.getLength();
+        for(int i=0; i<length;i++) {
+            Node item = nodeMap.item(i);
+            System.out.println(item.getNodeValue());
+            System.out.println("-------------");
+        }
+    }
+
+    public String getReleasedPomVersionString() {
+        String urlString = SERVER_URL + "/httpAuth/app/rest/builds/id:" + getBuildId() + "/artifacts/content/pomVersion.txt";
+
+        System.out.println("Build Param Endpoint = " + urlString);
+
+        try {
+            URL url = new URL(urlString);
+            String encoding = new BASE64Encoder().encode(userPassword.getBytes());
+            URLConnection uc = url.openConnection();
+            uc.setRequestProperty("Authorization","Basic " + encoding);
+            uc.connect();
+            String releasedPomVersion = mapper.readValue(uc.getInputStream(), String.class);
+            System.out.println("releasedPomVersion = " + releasedPomVersion);
+            return releasedPomVersion;
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
     public String getIssue(){

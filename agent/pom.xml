@@ -40,6 +40,7 @@
     </repositories>    
 
     <properties>
+        <jackson.version>2.6.5</jackson.version>
         <jira.restapi.version>1.0</jira.restapi.version>
         <teamcity.version>9.0.3</teamcity.version>
     </properties>
@@ -62,7 +63,28 @@
             <artifactId>jira-rest-java-client</artifactId>
             <version>${jira.restapi.version}</version>
         </dependency>
-   </dependencies>
+        <dependency>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpclient</artifactId>
+            <version>4.3.4</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>commons-codec</groupId>
+                    <artifactId>commons-codec</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+            <version>${jackson.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-core</artifactId>
+            <version>${jackson.version}</version>
+        </dependency>
+    </dependencies>
 
    <build>
         <finalName>jirareporter</finalName>
@@ -70,6 +92,7 @@
         <plugins>
             <plugin>
                 <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.3</version>
                 <configuration>
                     <source>${maven.compiler.source}</source>
                     <target>${maven.compiler.target}</target>
