@@ -9,13 +9,18 @@ import com.atlassian.jira.rest.client.domain.Comment;
 import com.atlassian.jira.rest.client.domain.Issue;
 import com.atlassian.jira.rest.client.domain.Resolution;
 import com.atlassian.jira.rest.client.domain.Transition;
+import com.atlassian.jira.rest.client.domain.Version;
 import com.atlassian.jira.rest.client.domain.input.TransitionInput;
+import com.atlassian.jira.rest.client.domain.input.VersionInput;
+import com.atlassian.jira.rest.client.domain.input.VersionInputBuilder;
 import com.atlassian.jira.rest.client.internal.jersey.JerseyJiraRestClientFactory;
+import org.joda.time.DateTime;
 
 import java.net.URI;
 import java.net.URISyntaxException;
 
 public class JIRAClient {
+    private static final NullProgressMonitor pm = new NullProgressMonitor();
 
     public static JiraRestClient getRestClient() {
         System.setProperty("jsse.enableSNIExtension", RunnerParamsProvider.sslConnectionIsEnabled());
@@ -30,10 +35,9 @@ public class JIRAClient {
     }
 
     public static Issue getIssue() {
-        NullProgressMonitor pm = new NullProgressMonitor();
         Issue issue = null;
         try {
-            issue = getRestClient().getIssueClient().getIssue(Reporter.getIssueId(), pm);
+            issue = getRestClient().getIssueClient().getIssue(Reporter.getIssueKey(), pm);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -45,7 +49,7 @@ public class JIRAClient {
     }
 
     private static Iterable<Transition> getTransitions (){
-        return getRestClient().getIssueClient().getTransitions(getIssue().getTransitionsUri(), new NullProgressMonitor());
+        return getRestClient().getIssueClient().getTransitions(getIssue().getTransitionsUri(), pm);
     }
 
     private static Transition getTransition(String transitionName){
@@ -72,7 +76,7 @@ public class JIRAClient {
     }
 
     private static Iterable<Resolution> getResolutions() {
-        return getRestClient().getMetadataClient().getResolutions(new NullProgressMonitor());
+        return getRestClient().getMetadataClient().getResolutions(pm);
     }
 
     public static Resolution getResolutionByName(String resolutionName) {
@@ -83,5 +87,27 @@ public class JIRAClient {
             }
         }
         return null;
+    }
+
+    private static Version createVersion(String versionName, String projectKey) {
+        //create new version
+        VersionInput versionInput = new VersionInputBuilder(projectKey)
+                                            .setName(versionName)
+                                            .setReleaseDate(new DateTime())
+                                            .setReleased(true)
+                                            .build();
+        return getRestClient().getVersionRestClient().createVersion(versionInput, pm);
+    }
+
+    public static Version getVersion(String versionName) {
+        String projectKey = getIssue().getProject().getKey();
+        Iterable<Version> versions = getRestClient().getProjectClient().getProject(projectKey, pm).getVersions();
+        for (Version version : versions) {
+            if (version.getName().equals(versionName)) {
+                return version;
+            }
+        }
+        return createVersion(versionName, projectKey);
+
     }
 }

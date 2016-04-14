@@ -6,7 +6,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableMap;
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
-import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 import sun.misc.BASE64Encoder;
@@ -42,7 +41,6 @@ public class TeamCityXMLParser {
             Document doc = db.parse(new InputSource(uc.getInputStream()));
             doc.getDocumentElement().normalize();
             return doc.getElementsByTagName(tag);
-//            return nodeList.item(num);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -55,26 +53,12 @@ public class TeamCityXMLParser {
     }
 
     private String getBuildAttribute(String attribute){
-//        System.out.println("^^^^^^^^^^^^^^^^^^^^^^^^");
-//        printNodeMap(buildData);
-//        System.out.println("^^^^^^^^^^^^^^^^^^^^^^^^");
         return buildData.getNamedItem(attribute).getNodeValue();
 
     }
 
-    private void printNodeMap(NamedNodeMap nodeMap) {
-        int length = nodeMap.getLength();
-        for(int i=0; i<length;i++) {
-            Node item = nodeMap.item(i);
-            System.out.println(item.getNodeValue());
-            System.out.println("-------------");
-        }
-    }
-
     public String getReleasedPomVersionString() {
         String urlString = SERVER_URL + "/httpAuth/app/rest/builds/id:" + getBuildId() + "/artifacts/content/pomVersion.txt";
-
-        System.out.println("Build Param Endpoint = " + urlString);
 
         try {
             URL url = new URL(urlString);
@@ -82,16 +66,14 @@ public class TeamCityXMLParser {
             URLConnection uc = url.openConnection();
             uc.setRequestProperty("Authorization","Basic " + encoding);
             uc.connect();
-            String releasedPomVersion = mapper.readValue(uc.getInputStream(), String.class);
-            System.out.println("releasedPomVersion = " + releasedPomVersion);
-            return releasedPomVersion;
+            return mapper.readValue(uc.getInputStream(), String.class);
         } catch (IOException e) {
             e.printStackTrace();
         }
         return null;
     }
 
-    public String getIssue(){
+    public String getIssueKey(){
         StringBuilder sb = new StringBuilder();
         try{
             NodeList issueList = getNodeList(SERVER_URL +"/httpAuth/app/rest/builds/id:"+getBuildId()+"/relatedIssues", "issue");

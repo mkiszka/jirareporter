@@ -2,7 +2,11 @@
 package com.amirov.jirareporter;
 
 import jetbrains.buildServer.RunBuildException;
-import jetbrains.buildServer.agent.*;
+import jetbrains.buildServer.agent.AgentRunningBuild;
+import jetbrains.buildServer.agent.BuildFinishedStatus;
+import jetbrains.buildServer.agent.BuildProcess;
+import jetbrains.buildServer.agent.BuildProgressLogger;
+import jetbrains.buildServer.agent.BuildRunnerContext;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.HashMap;
@@ -42,15 +46,13 @@ public class JIRABuildProcess implements BuildProcess{
         RunnerParamsProvider.setProperty("buildName", myContext.getBuild().getBuildTypeName());
         if(issueId == null || issueId.isEmpty()){
             logger.message("Issue is not related");
-        }
-        else {
+        } else {
             if(issueId.contains(",")){
                 for(String issue : issueId.split(",")){
                     reporter.report(issue);
                     reporter.progressIssue();
                 }
-            }
-            else {
+            } else {
                 reporter.report(issueId);
                 reporter.progressIssue();
             }
