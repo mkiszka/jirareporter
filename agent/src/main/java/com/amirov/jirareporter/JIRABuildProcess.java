@@ -45,7 +45,7 @@ public class JIRABuildProcess implements BuildProcess{
         }
         RunnerParamsProvider.setProperty("buildName", myContext.getBuild().getBuildTypeName());
         if(issueId == null || issueId.isEmpty()){
-            logger.message("Issue is not related");
+            logger.message("No Issue was found in the change log for this build.");
         } else {
             if(issueId.contains(",")){
                 for(String issue : issueId.split(",")){

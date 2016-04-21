@@ -37,8 +37,8 @@ public class Reporter {
 
     public void report(String issueKeyString){
         issueKey = issueKeyString;
-        myLogger.message("\nISSUE: " + issueKeyString
-                + "\nTitle: " + getIssue().getSummary()
+        myLogger.message("\nISSUE: " + issueKeyString);
+        myLogger.message("\nTitle: " + getIssue().getSummary()
                 + "\nDescription: " + getIssue().getDescription());
         NullProgressMonitor pm = new NullProgressMonitor();
         getRestClient().getIssueClient().addComment(pm, getIssue().getCommentsUri(), Comment.valueOf(parser.getTestResultText()));

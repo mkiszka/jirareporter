@@ -40,6 +40,7 @@ public class JIRAClient {
             issue = getRestClient().getIssueClient().getIssue(Reporter.getIssueKey(), pm);
         } catch (Exception e) {
             e.printStackTrace();
+            System.out.println(e.getMessage());
         }
         return issue;
     }
