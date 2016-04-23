@@ -37,7 +37,10 @@ public class JIRAClient {
     public static Issue getIssue() {
         Issue issue = null;
         try {
-            issue = getRestClient().getIssueClient().getIssue(Reporter.getIssueKey(), pm);
+            String issueKey = Reporter.getIssueKey();
+            System.out.println("Reporter.getIssueKey() = " + issueKey);
+            issue = getRestClient().getIssueClient().getIssue(issueKey, pm);
+            System.out.println("issue = " + issue);
         } catch (Exception e) {
             e.printStackTrace();
             System.out.println(e.getMessage());

@@ -77,8 +77,11 @@ public class TeamCityXMLParser {
         StringBuilder sb = new StringBuilder();
         try{
             NodeList issueList = getNodeList(SERVER_URL +"/httpAuth/app/rest/builds/id:"+getBuildId()+"/relatedIssues", "issue");
+            System.out.println("***** inside getIssueKey() *****");
+            System.out.println("NodeList issueList = " + issueList);
             for(int i = 0; i<issueList.getLength(); i++){
                 String issue = issueList.item(i).getAttributes().getNamedItem("id").getNodeValue();
+                System.out.println("IssueKey = " + issue);
                 if(sb.toString().contains(issue)){
                     System.out.println("Issue is duplicated");
                 }

@@ -47,6 +47,7 @@ public class JIRABuildProcess implements BuildProcess{
         if(issueId == null || issueId.isEmpty()){
             logger.message("No Issue was found in the change log for this build.");
         } else {
+            logger.message("Found issueId = {" + issueId + "}");
             if(issueId.contains(",")){
                 for(String issue : issueId.split(",")){
                     reporter.report(issue);

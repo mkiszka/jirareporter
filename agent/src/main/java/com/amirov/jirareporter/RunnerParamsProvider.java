@@ -72,6 +72,7 @@ public  class RunnerParamsProvider {
     public static String getIssueId(){
         String issueId = "";
         String issueIdPlace = getIssueIdPlace();
+        System.out.println("issueIdPlace = " + issueIdPlace);
         if (issueIdPlace.equals("teamcity")) {
             TeamCityXMLParser parser = new TeamCityXMLParser();
             String issueTC = parser.getIssueKey();
