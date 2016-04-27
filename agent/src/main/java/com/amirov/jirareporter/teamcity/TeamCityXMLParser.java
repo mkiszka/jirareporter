@@ -4,6 +4,7 @@ package com.amirov.jirareporter.teamcity;
 import com.amirov.jirareporter.RunnerParamsProvider;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableMap;
+import jetbrains.buildServer.util.StringUtil;
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.NodeList;
@@ -15,7 +16,9 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.IOException;
 import java.net.URL;
 import java.net.URLConnection;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 public class TeamCityXMLParser {
     private String SERVER_URL = RunnerParamsProvider.getTCServerUrl();
@@ -75,23 +78,19 @@ public class TeamCityXMLParser {
 
     public String getIssueKey(){
         StringBuilder sb = new StringBuilder();
-        try{
+        try {
             NodeList issueList = getNodeList(SERVER_URL +"/httpAuth/app/rest/builds/id:"+getBuildId()+"/relatedIssues", "issue");
             System.out.println("***** inside getIssueKey() *****");
             System.out.println("NodeList issueList = " + issueList);
+            Set<String> issueIds = new HashSet<>();
             for(int i = 0; i<issueList.getLength(); i++){
-                String issue = issueList.item(i).getAttributes().getNamedItem("id").getNodeValue();
-                System.out.println("IssueKey = " + issue);
-                if(sb.toString().contains(issue)){
-                    System.out.println("Issue is duplicated");
-                }
-                else {
-                    sb.append(issue+",");
-                }
+                String issueKey = issueList.item(i).getAttributes().getNamedItem("id").getNodeValue();
+                System.out.println("IssueKey = " + issueKey);
+                issueIds.add(issueKey);
             }
-        }
-        catch (NullPointerException e){
-            System.out.println("Issue is not related");
+            StringUtil.join(",", issueIds, sb);
+        } catch (NullPointerException e){
+            System.out.println("No issues were found for changes in this build.");
         }
         return sb.toString();
     }

@@ -4,6 +4,7 @@ import com.amirov.jirareporter.jira.JIRAConfig;
 import com.amirov.jirareporter.teamcity.TeamCityXMLParser;
 import com.atlassian.jira.rest.client.NullProgressMonitor;
 import com.atlassian.jira.rest.client.domain.Comment;
+import com.atlassian.jira.rest.client.domain.Issue;
 import com.atlassian.jira.rest.client.domain.Resolution;
 import com.atlassian.jira.rest.client.domain.Transition;
 import com.atlassian.jira.rest.client.domain.Version;
@@ -38,10 +39,11 @@ public class Reporter {
     public void report(String issueKeyString){
         issueKey = issueKeyString;
         myLogger.message("\nISSUE: " + issueKeyString);
-        myLogger.message("\nTitle: " + getIssue().getSummary()
-                + "\nDescription: " + getIssue().getDescription());
+        final Issue issue = getIssue(myLogger);
+        myLogger.message("\nTitle: " + issue.getSummary()
+                + "\nDescription: " + issue.getDescription());
         NullProgressMonitor pm = new NullProgressMonitor();
-        getRestClient().getIssueClient().addComment(pm, getIssue().getCommentsUri(), Comment.valueOf(parser.getTestResultText()));
+        getRestClient().getIssueClient().addComment(pm, issue.getCommentsUri(), Comment.valueOf(parser.getTestResultText()));
     }
 
     public void progressIssue() {

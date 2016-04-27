@@ -3,6 +3,7 @@ package com.amirov.jirareporter.jira;
 import com.amirov.jirareporter.Reporter;
 import com.amirov.jirareporter.RunnerParamsProvider;
 import com.amirov.jirareporter.teamcity.TeamCityXMLParser;
+import com.atlassian.jira.rest.client.IssueRestClient;
 import com.atlassian.jira.rest.client.JiraRestClient;
 import com.atlassian.jira.rest.client.NullProgressMonitor;
 import com.atlassian.jira.rest.client.domain.Comment;
@@ -14,6 +15,7 @@ import com.atlassian.jira.rest.client.domain.input.TransitionInput;
 import com.atlassian.jira.rest.client.domain.input.VersionInput;
 import com.atlassian.jira.rest.client.domain.input.VersionInputBuilder;
 import com.atlassian.jira.rest.client.internal.jersey.JerseyJiraRestClientFactory;
+import jetbrains.buildServer.agent.BuildProgressLogger;
 import org.joda.time.DateTime;
 
 import java.net.URI;
@@ -34,6 +36,22 @@ public class JIRAClient {
         return factory.createWithBasicHttpAuthentication(jiraServerUri, RunnerParamsProvider.getJiraUser(), RunnerParamsProvider.getJiraPassword());
     }
 
+    public static JiraRestClient getRestClient(BuildProgressLogger myLogger) {
+        System.setProperty("jsse.enableSNIExtension", RunnerParamsProvider.sslConnectionIsEnabled());
+        JerseyJiraRestClientFactory factory = new JerseyJiraRestClientFactory();
+        myLogger.message("JerseyJiraRestClientFactory factory = " + factory);
+        URI jiraServerUri = null;
+        try {
+            jiraServerUri = new URI(RunnerParamsProvider.getJiraServerUrl());
+            myLogger.message("jiraServerUri = " + jiraServerUri);
+        } catch (URISyntaxException e) {
+            e.printStackTrace();
+            myLogger.exception(e);
+        }
+        myLogger.message("Jira User = " + RunnerParamsProvider.getJiraUser());
+        return factory.createWithBasicHttpAuthentication(jiraServerUri, RunnerParamsProvider.getJiraUser(), RunnerParamsProvider.getJiraPassword());
+    }
+
     public static Issue getIssue() {
         Issue issue = null;
         try {
@@ -44,6 +62,25 @@ public class JIRAClient {
         } catch (Exception e) {
             e.printStackTrace();
             System.out.println(e.getMessage());
+        }
+        return issue;
+    }
+
+    public static Issue getIssue(BuildProgressLogger myLogger) {
+        Issue issue = null;
+        try {
+            String issueKey = Reporter.getIssueKey();
+            myLogger.message("Reporter.getIssueKey() = " + issueKey);
+            final JiraRestClient restClient = getRestClient(myLogger);
+            myLogger.message("restClient = " + restClient);
+            final IssueRestClient issueClient = restClient.getIssueClient();
+            myLogger.message("issueClient = " + issueClient);
+            issue = issueClient.getIssue(issueKey, pm);
+            myLogger.message("issue = " + issue);
+        } catch (Exception e) {
+            e.printStackTrace();
+            myLogger.message("ERROR with getting the issue!!!" + e.getMessage());
+            myLogger.exception(e);
         }
         return issue;
     }
