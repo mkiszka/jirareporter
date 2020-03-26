@@ -1,56 +1,57 @@
 package com.amirov.jirareporter;
 
-import com.amirov.jirareporter.jira.JIRAConfig;
-import com.amirov.jirareporter.teamcity.TeamCityXMLParser;
-import com.atlassian.jira.rest.client.NullProgressMonitor;
-import com.atlassian.jira.rest.client.domain.Comment;
+import com.amirov.jirareporter.jira.JIRAClient;
+import com.amirov.jirareporter.teamcity.IBuildInfo;
 import com.atlassian.jira.rest.client.domain.Issue;
-import com.atlassian.jira.rest.client.domain.Resolution;
-import com.atlassian.jira.rest.client.domain.Transition;
-import com.atlassian.jira.rest.client.domain.Version;
-import com.atlassian.jira.rest.client.domain.input.ComplexIssueInputFieldValue;
-import com.atlassian.jira.rest.client.domain.input.FieldInput;
-import com.atlassian.jira.rest.client.domain.input.TransitionInput;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import jetbrains.buildServer.agent.BuildProgressLogger;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
+import java.net.URISyntaxException;
 import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
-import static com.amirov.jirareporter.jira.JIRAClient.*;
+public class Reporter
+{
+    private final RunnerParamsProvider _prmsProvider;
+    private final BuildProgressLogger _logger;
 
-public class Reporter {
-    private static String issueKey;
-    private BuildProgressLogger myLogger;
-    private TeamCityXMLParser parser = new TeamCityXMLParser();
+    public Reporter(RunnerParamsProvider prmsProvider)
+    {
+        _prmsProvider = prmsProvider;
+        _logger = prmsProvider.getLogger();
+    }
+
+    public void report(Collection<String> issueIds, IBuildInfo buildInfo) throws URISyntaxException
+    {
+        String comment = buildInfo.buildCommentText();
+        _logger.message("Ready to report to JIRA. Message: " + comment);
+
+        JIRAClient jira = new JIRAClient(_prmsProvider);
+        for (String issueId : issueIds)
+        {
+            _logger.message("Loading issue " + issueId);
+            final Issue issue = jira.getIssue(issueId);
+            if (_prmsProvider.isCommentingEnabled())
+            {
+                _logger.message("Adding comment...");
+                jira.addComment(issue, comment);
+            }
+
+            if (_prmsProvider.isLinkToBuildPageEnabled())
+            {
+                _logger.message("Making link to TeamCity build page...");
+                String title = buildInfo.getBuildName() + " " + buildInfo.getBuildNumber();
+                jira.makeLink(issue, buildInfo.getWebUrl() + "&tab=artifacts", title);
+            }
+        }
+        _logger.message("Reporting completed!");
+    }
+
+    /*
     private static final ObjectMapper mapper = new ObjectMapper();
-
-
-    public Reporter(BuildProgressLogger logger){
-        myLogger = logger;
-    }
-
-    public void report(String issueKeyString){
-        issueKey = issueKeyString;
-        myLogger.message("\nISSUE: " + issueKeyString);
-        final Issue issue = getIssue(myLogger);
-        myLogger.message("\nTitle: " + issue.getSummary()
-                + "\nDescription: " + issue.getDescription());
-        NullProgressMonitor pm = new NullProgressMonitor();
-        getRestClient().getIssueClient().addComment(pm, issue.getCommentsUri(), Comment.valueOf(parser.getTestResultText()));
-    }
-
     public void progressIssue() {
         NullProgressMonitor pm = new NullProgressMonitor();
-        if(RunnerParamsProvider.progressIssueIsEnable() == null){}
-        else if(RunnerParamsProvider.progressIssueIsEnable().equals("true")){
-            String transitionName = JIRAConfig.prepareJiraWorkflow(parser.getStatusBuild()).get(getIssueStatus());
+        if(RunnerParamsProvider.isProgressIssueEnabled() == null){}
+        else if(RunnerParamsProvider.isProgressIssueEnabled().equals("true")){
+            String transitionName = JIRAConfig.prepareJiraWorkflow(parser.getBuildStatus()).get(getIssueStatus());
             if (transitionName != null) {
                 //Get Transition
                 Transition transition = getTransitionByName(transitionName);
@@ -83,12 +84,8 @@ public class Reporter {
                 //SHIP IT!!!
                 getRestClient().getIssueClient().transition(getIssue().getTransitionsUri(), resolvedTransitionInput, pm);
 
-                myLogger.message(issueKey + " has been transitioned to Closed with resolution Fixed and Fix Version of " + version.getName());
+                _logger.message(issueKey + " has been transitioned to Closed with resolution Fixed and Fix Version of " + version.getName());
             }
         }
-    }
-
-    public static String getIssueKey(){
-        return issueKey;
-    }
+    }*/
 }

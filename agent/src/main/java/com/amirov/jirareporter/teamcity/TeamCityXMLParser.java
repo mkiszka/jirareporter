@@ -1,159 +1,151 @@
 package com.amirov.jirareporter.teamcity;
 
-
 import com.amirov.jirareporter.RunnerParamsProvider;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.collect.ImmutableMap;
-import jetbrains.buildServer.util.StringUtil;
+import jetbrains.buildServer.agent.BuildProgressLogger;
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
-import sun.misc.BASE64Encoder;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
-import java.io.IOException;
-import java.net.URL;
-import java.net.URLConnection;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.net.*;
+import java.util.ArrayList;
+import java.util.Collection;
 
-public class TeamCityXMLParser {
-    private String SERVER_URL = RunnerParamsProvider.getTCServerUrl();
-    private String userPassword = RunnerParamsProvider.getTCUser()+":"+ RunnerParamsProvider.getTCPassword();
-    private NamedNodeMap buildData;
-    public String buildTypeId = RunnerParamsProvider.getBuildTypeId();
-    private static final ObjectMapper mapper = new ObjectMapper();
+public class TeamCityXMLParser implements IBuildInfo
+{
+    private static final String SUCCESS = "SUCCESS";
+    private static final String FAILURE = "FAILURE";
+    //private static final ObjectMapper mapper = new ObjectMapper();
 
-    public TeamCityXMLParser(){
-        String BUILDS_XML_URL = "/httpAuth/app/rest/builds?locator=branch:default:any,running:true,buildType:";
-        buildData = parseXML(SERVER_URL+ BUILDS_XML_URL +buildTypeId, "build");
+    private final BuildProgressLogger _logger;
+    private final RunnerParamsProvider _prmsProvider;
+    private final String _tcBaseUrl;
+    private final String _buildTypeId;
+    private NamedNodeMap _buildData;
+
+    public TeamCityXMLParser(RunnerParamsProvider prmsProvider)
+    {
+        _logger = prmsProvider.getLogger();
+        _prmsProvider = prmsProvider;
+        _tcBaseUrl = prmsProvider.getTCServerUrl();
+        _buildTypeId = prmsProvider.getBuildTypeId();
+
+        CookieHandler.setDefault(new CookieManager(null, CookiePolicy.ACCEPT_ALL));
+        Authenticator.setDefault(new Authenticator()
+        {
+            @Override
+            public PasswordAuthentication getPasswordAuthentication()
+            {
+                _logger.message("Feeding username and password for " + getRequestingScheme());
+                return (new PasswordAuthentication(_prmsProvider.getTCUser(), _prmsProvider.getTCPassword().toCharArray()));
+            }
+        });
     }
 
-    private NodeList getNodeList(String xmlUrl, String tag) {
-        try{
-            URL url = new URL(xmlUrl);
-            String encoding = new BASE64Encoder().encode(userPassword.getBytes());
+    public Collection<String> getIssueKeys()
+    {
+        // running:true,
+        NodeList buildNodes = loadXmlNodeList("/app/rest/builds?locator=branch:default:any,running:any,buildType:" + _buildTypeId, "build");
+        if (buildNodes.getLength() == 0)
+            return null;
+
+        ArrayList<String> issueIds = new ArrayList<>();
+        // Collect all builds till last success
+        _buildData = buildNodes.item(0).getAttributes();
+        for (int i = 0; i < buildNodes.getLength(); i++)
+        {
+            NamedNodeMap attrs = buildNodes.item(i).getAttributes();
+            if (i > 0 && SUCCESS.equalsIgnoreCase(attrs.getNamedItem("status").getNodeValue()))
+                break;
+
+            String buildId = attrs.getNamedItem("id").getNodeValue();
+            String buildNum = attrs.getNamedItem("number").getNodeValue();
+
+            NodeList issueList = loadXmlNodeList("/app/rest/builds/id:" + buildId + "/relatedIssues", "issue");
+            _logger.message("Found " + issueList.getLength() + " related issues for build " + buildNum);
+            for(int x = 0; x < issueList.getLength(); x++)
+            {
+                String issueKey = issueList.item(x).getAttributes().getNamedItem("id").getNodeValue();
+                if (!issueIds.contains(issueKey))
+                    issueIds.add(issueKey);
+            }
+        }
+        return issueIds;
+    }
+
+    public String getBuildId(){ return getBuildAttribute("id"); }
+
+    public String getBuildStatus(){ return getBuildAttribute("status"); }
+
+    public String getBuildNumber () { return getBuildAttribute("number"); }
+
+    public String getBuildName() { return _prmsProvider.getBuildName(); }
+
+    public String getBuildHref(){ return getBuildAttribute("href"); }
+
+    public String getWebUrl(){ return getBuildAttribute("webUrl"); }
+
+    public String getBuildTestsStatus()
+    {
+        return loadXmlNodeList(getBuildHref(), "statusText").item(0).getTextContent();
+    }
+
+    public String getArtifactHref()
+    {
+        return loadXmlNodeList(getBuildHref(), "artifacts").item(0).getAttributes().getNamedItem("href").getNodeValue();
+    }
+
+    public String getArtifactName()
+    {
+        return loadXmlNodeList(getArtifactHref(), "file").item(0).getAttributes().getNamedItem("name").getNodeValue();
+    }
+
+    public String buildCommentText()
+    {
+        String statusStyle = FAILURE.equalsIgnoreCase(getBuildStatus()) ? "#DE350B" : "#00875A";
+        if(_prmsProvider.isCommentTemplateEnabled())
+            return _prmsProvider.getTemplateComment()
+                    .replace("${build.id}", getBuildId())
+                    .replace("${build.type}", _buildTypeId)
+                    .replace("${build.name}", _prmsProvider.getBuildName())
+                    .replace("${build.number}", getBuildNumber())
+                    .replace("${build.status}", getBuildStatus())
+                    .replace("${build.status.style}", statusStyle)
+                    .replace("${build.weburl}", getWebUrl())
+                    .replace("${tests.results}", getBuildTestsStatus());
+        else
+        {
+            return String.format("%s [#%s|%s] Build result: {color:%s}*%s*{color}"
+                 , _prmsProvider.getBuildName(), getBuildNumber(), getWebUrl(), statusStyle, getBuildStatus());
+        }
+    }
+
+    private NodeList loadXmlNodeList(String xmlUrl, String nodeName)
+    {
+        try
+        {
+            if (!_prmsProvider.getTCWindowsAuth())
+                xmlUrl = "/httpAuth" + xmlUrl;
+
+            URL url = new URL(_tcBaseUrl + xmlUrl);
             URLConnection uc = url.openConnection();
-            uc.setRequestProperty("Authorization","Basic " + encoding);
             uc.connect();
             DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
             DocumentBuilder db = dbf.newDocumentBuilder();
             Document doc = db.parse(new InputSource(uc.getInputStream()));
             doc.getDocumentElement().normalize();
-            return doc.getElementsByTagName(tag);
-        } catch (Exception e) {
-            e.printStackTrace();
+            return doc.getElementsByTagName(nodeName);
         }
-        return null;
-    }
-
-    private NamedNodeMap parseXML(String xmlUrl, String tag){
-        RunnerParamsProvider.setProperty("build.xml.url", xmlUrl);
-        return getNodeList(xmlUrl, tag).item(0).getAttributes();
-    }
-
-    private String getBuildAttribute(String attribute){
-        return buildData.getNamedItem(attribute).getNodeValue();
-
-    }
-
-    public String getReleasedPomVersionString() {
-        String urlString = SERVER_URL + "/httpAuth/app/rest/builds/id:" + getBuildId() + "/artifacts/content/pomVersion.txt";
-
-        try {
-            URL url = new URL(urlString);
-            String encoding = new BASE64Encoder().encode(userPassword.getBytes());
-            URLConnection uc = url.openConnection();
-            uc.setRequestProperty("Authorization","Basic " + encoding);
-            uc.connect();
-            return mapper.readValue(uc.getInputStream(), String.class);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
-
-    public String getIssueKey(){
-        StringBuilder sb = new StringBuilder();
-        try {
-            NodeList issueList = getNodeList(SERVER_URL +"/httpAuth/app/rest/builds/id:"+getBuildId()+"/relatedIssues", "issue");
-            System.out.println("***** inside getIssueKey() *****");
-            System.out.println("NodeList issueList = " + issueList);
-            Set<String> issueIds = new HashSet<>();
-            for(int i = 0; i<issueList.getLength(); i++){
-                String issueKey = issueList.item(i).getAttributes().getNamedItem("id").getNodeValue();
-                System.out.println("IssueKey = " + issueKey);
-                issueIds.add(issueKey);
-            }
-            StringUtil.join(",", issueIds, sb);
-        } catch (NullPointerException e){
-            System.out.println("No issues were found for changes in this build.");
-        }
-        return sb.toString();
-    }
-
-    public String getStatusBuild(){
-        return getBuildAttribute("status");
-    }
-
-    public String getBranchName (){
-        return getBuildAttribute("branchName");
-    }
-
-    public String getBuildHref(){
-        return getBuildAttribute("href");
-    }
-
-    public  String getWebUrl(){
-        return getBuildAttribute("webUrl");
-    }
-
-    public String getBuildTestsStatus(){
-        return getNodeList(SERVER_URL + getBuildHref(), "statusText").item(0).getTextContent();
-    }
-
-    public String getBuildId(){
-        return getBuildAttribute("id");
-    }
-
-    public String getArtifactHref(){
-        return getNodeList(SERVER_URL + getBuildHref(), "artifacts").item(0).getAttributes().getNamedItem("href").getNodeValue();
-    }
-
-    public String getArtifactName(){
-        return getNodeList(SERVER_URL + getArtifactHref(), "file").item(0).getAttributes().getNamedItem("name").getNodeValue();
-    }
-
-    public String getTestResultText(){
-        if(RunnerParamsProvider.enableCommentTemplate().equals("true")){
-            return getTemplateComment();
-        }
-        else {
-            return getStatusBuild()+"\nBuild Finished\nResults:\n ["+RunnerParamsProvider.getBuildTypeName()+" : "+getBuildTestsStatus()+"|"+SERVER_URL +"/viewLog.html?buildId="+getBuildId()+"&tab=buildResultsDiv&buildTypeId="+ buildTypeId+"]";
+        catch (Exception ex)
+        {
+            throw new RuntimeException(ex);
         }
     }
 
-    public ImmutableMap<String, String> getTemplateValue(){
-        return new ImmutableMap.Builder<String, String>()
-                .put("*status.build*", getStatusBuild())
-                .put("*build.type.name*", RunnerParamsProvider.getBuildTypeName())
-                .put("*tests.results*", getBuildTestsStatus())
-                .put("*teamcity.server.url*", SERVER_URL)
-                .put("*build.id*", getBuildId())
-                .put("*build.type*", buildTypeId)
-                .build();
-    }
-
-    public String getTemplateComment(){
-        String template = RunnerParamsProvider.getTemplateComment();
-        for(Map.Entry<String, String> entry : getTemplateValue().entrySet()){
-            if(template.contains(entry.getKey())){
-                template = template.replace(entry.getKey(), entry.getValue());
-            }
-        }
-        return template;
+    private String getBuildAttribute(String attribute)
+    {
+        return _buildData.getNamedItem(attribute).getNodeValue();
     }
 }

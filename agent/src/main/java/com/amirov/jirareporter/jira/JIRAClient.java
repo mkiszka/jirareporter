@@ -1,96 +1,74 @@
 package com.amirov.jirareporter.jira;
 
-import com.amirov.jirareporter.Reporter;
 import com.amirov.jirareporter.RunnerParamsProvider;
-import com.amirov.jirareporter.teamcity.TeamCityXMLParser;
-import com.atlassian.jira.rest.client.IssueRestClient;
 import com.atlassian.jira.rest.client.JiraRestClient;
 import com.atlassian.jira.rest.client.NullProgressMonitor;
 import com.atlassian.jira.rest.client.domain.Comment;
 import com.atlassian.jira.rest.client.domain.Issue;
-import com.atlassian.jira.rest.client.domain.Resolution;
-import com.atlassian.jira.rest.client.domain.Transition;
-import com.atlassian.jira.rest.client.domain.Version;
-import com.atlassian.jira.rest.client.domain.input.TransitionInput;
-import com.atlassian.jira.rest.client.domain.input.VersionInput;
-import com.atlassian.jira.rest.client.domain.input.VersionInputBuilder;
 import com.atlassian.jira.rest.client.internal.jersey.JerseyJiraRestClientFactory;
-import jetbrains.buildServer.agent.BuildProgressLogger;
-import org.joda.time.DateTime;
+import com.sun.jersey.client.apache.ApacheHttpClient;
 
+import java.lang.reflect.Field;
 import java.net.URI;
 import java.net.URISyntaxException;
 
-public class JIRAClient {
-    private static final NullProgressMonitor pm = new NullProgressMonitor();
+public class JIRAClient
+{
+    private static final NullProgressMonitor NPM = new NullProgressMonitor();
+    private final JiraRestClient _client;
+    private JerseyRemoteLinkRestClient _remoteLinkClient;
 
-    public static JiraRestClient getRestClient() {
-        System.setProperty("jsse.enableSNIExtension", RunnerParamsProvider.sslConnectionIsEnabled());
+    public JIRAClient(RunnerParamsProvider prmsProvider) throws URISyntaxException
+    {
+        System.setProperty("jsse.enableSNIExtension", Boolean.toString(!prmsProvider.isSslConnectionEnabled()));
         JerseyJiraRestClientFactory factory = new JerseyJiraRestClientFactory();
-        URI jiraServerUri = null;
-        try {
-            jiraServerUri = new URI(RunnerParamsProvider.getJiraServerUrl());
-        } catch (URISyntaxException e) {
-            e.printStackTrace();
+        URI jiraServerUri = new URI(prmsProvider.getJiraServerUrl());
+
+        if (prmsProvider.getJiraWindowsAuth())
+            _client = factory.create(jiraServerUri, new NTLMAuthenticationHandler(prmsProvider));
+        else _client = factory.createWithBasicHttpAuthentication(jiraServerUri, prmsProvider.getJiraUser(), prmsProvider.getJiraPassword());
+
+        if (prmsProvider.isLinkToBuildPageEnabled())
+        {
+            try
+            {
+                Object o = _client.getIssueClient();
+                Class c = o.getClass().getSuperclass();
+                Field field1 = c.getDeclaredField("client");
+                Field field2 = c.getDeclaredField("baseUri");
+                field1.setAccessible(true);
+                field2.setAccessible(true);
+                _remoteLinkClient = new JerseyRemoteLinkRestClient((URI) field2.get(o), (ApacheHttpClient) field1.get(o));
+            }
+            catch (Exception ex)
+            {
+                prmsProvider.getLogger().warning("Unable to initialize RemoteLinkClient. Links won't be created. " + ex.getMessage());
+            }
         }
-        return factory.createWithBasicHttpAuthentication(jiraServerUri, RunnerParamsProvider.getJiraUser(), RunnerParamsProvider.getJiraPassword());
     }
 
-    public static JiraRestClient getRestClient(BuildProgressLogger myLogger) {
-        System.setProperty("jsse.enableSNIExtension", RunnerParamsProvider.sslConnectionIsEnabled());
-        JerseyJiraRestClientFactory factory = new JerseyJiraRestClientFactory();
-        myLogger.message("JerseyJiraRestClientFactory factory = " + factory);
-        URI jiraServerUri = null;
-        try {
-            jiraServerUri = new URI(RunnerParamsProvider.getJiraServerUrl());
-            myLogger.message("jiraServerUri = " + jiraServerUri);
-        } catch (URISyntaxException e) {
-            e.printStackTrace();
-            myLogger.exception(e);
-        }
-        myLogger.message("Jira User = " + RunnerParamsProvider.getJiraUser());
-        return factory.createWithBasicHttpAuthentication(jiraServerUri, RunnerParamsProvider.getJiraUser(), RunnerParamsProvider.getJiraPassword());
+    public Issue getIssue(String issueId)
+    {
+        return  _client.getIssueClient().getIssue(issueId, NPM);
     }
 
-    public static Issue getIssue() {
-        Issue issue = null;
-        try {
-            String issueKey = Reporter.getIssueKey();
-            System.out.println("Reporter.getIssueKey() = " + issueKey);
-            issue = getRestClient().getIssueClient().getIssue(issueKey, pm);
-            System.out.println("issue = " + issue);
-        } catch (Exception e) {
-            e.printStackTrace();
-            System.out.println(e.getMessage());
-        }
-        return issue;
+    public void addComment(Issue issue, String comment)
+    {
+        _client.getIssueClient().addComment(NPM, issue.getCommentsUri(), Comment.valueOf(comment));
     }
 
-    public static Issue getIssue(BuildProgressLogger myLogger) {
-        Issue issue = null;
-        try {
-            String issueKey = Reporter.getIssueKey();
-            myLogger.message("Reporter.getIssueKey() = " + issueKey);
-            final JiraRestClient restClient = getRestClient(myLogger);
-            myLogger.message("restClient = " + restClient);
-            final IssueRestClient issueClient = restClient.getIssueClient();
-            myLogger.message("issueClient = " + issueClient);
-            issue = issueClient.getIssue(issueKey, pm);
-            myLogger.message("issue = " + issue);
-        } catch (Exception e) {
-            e.printStackTrace();
-            myLogger.message("ERROR with getting the issue!!!" + e.getMessage());
-            myLogger.exception(e);
-        }
-        return issue;
+    public void makeLink(Issue issue, String url, String title)
+    {
+        _remoteLinkClient.makeRemoteLink(issue.getKey(), url, title);
     }
 
+    /*
     public static String getIssueStatus(){
         return getIssue().getStatus().getName();
     }
 
     private static Iterable<Transition> getTransitions (){
-        return getRestClient().getIssueClient().getTransitions(getIssue().getTransitionsUri(), pm);
+        return getRestClient().getIssueClient().getTransitions(getIssue().getTransitionsUri(), NPM);
     }
 
     private static Transition getTransition(String transitionName){
@@ -117,7 +95,7 @@ public class JIRAClient {
     }
 
     private static Iterable<Resolution> getResolutions() {
-        return getRestClient().getMetadataClient().getResolutions(pm);
+        return getRestClient().getMetadataClient().getResolutions(NPM);
     }
 
     public static Resolution getResolutionByName(String resolutionName) {
@@ -137,18 +115,18 @@ public class JIRAClient {
                                             .setReleaseDate(new DateTime())
                                             .setReleased(true)
                                             .build();
-        return getRestClient().getVersionRestClient().createVersion(versionInput, pm);
+        return getRestClient().getVersionRestClient().createVersion(versionInput, NPM);
     }
 
     public static Version getVersion(String versionName) {
         String projectKey = getIssue().getProject().getKey();
-        Iterable<Version> versions = getRestClient().getProjectClient().getProject(projectKey, pm).getVersions();
+        Iterable<Version> versions = getRestClient().getProjectClient().getProject(projectKey, NPM).getVersions();
         for (Version version : versions) {
             if (version.getName().equals(versionName)) {
                 return version;
             }
         }
         return createVersion(versionName, projectKey);
-
     }
+    */
 }

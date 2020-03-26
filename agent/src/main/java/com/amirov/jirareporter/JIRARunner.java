@@ -1,5 +1,3 @@
-
-
 package com.amirov.jirareporter;
 
 import jetbrains.buildServer.RunBuildException;

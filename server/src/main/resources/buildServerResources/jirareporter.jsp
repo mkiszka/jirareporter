@@ -12,70 +12,76 @@
 
 <l:settingsGroup title="JIRA configuration">
     <tr>
-        <td>
-            <span>Server URL:</span>
-            <br>
-            <props:textProperty name="jiraServerUrl" className="longField"/>
-            <br>
-            <span>User:</span>
-            <br>
-            <props:textProperty name="jiraUser" />
-            <br>
-            <span>Password:</span>
-            <br>
-            <props:passwordProperty name="jiraPassword"/>
-            <br>
-            <span>Get issue from:</span>
-            <props:selectProperty name="issueIdPlace">
-                <props:option value="teamcity">VCS comment</props:option>
-                <props:option value="custom">JIRA Reporter</props:option>
-            </props:selectProperty>
-            <br>
-            <div id="jira.issue.id" style="display: none">
-                <span>ISSUE ID:</span>
-                <br>
-                <props:textProperty name="issueId" />
-            </div>
-            <br>
-            <span>Enable issue progressing:</span>
-            <props:checkboxProperty name="enableIssueProgressing"/>
-            <br>
-            <div id="jira.workflow">
-                <props:multilineProperty name="jiraWorkflow" rows="5" cols="58" linkTitle="Enter your JIRA workflow for issue progressing"/>
-            </div>
-            <br>
-            <span>Enable SSL connection:</span>
-            <props:checkboxProperty name="enableSSLConnection"/>
-            <br>
-            <span>Enable comment template for JIRA</span>
-            <props:checkboxProperty name="enableTemplateComment"/>
-            <br>
-            <div id="templateJiraComment">
-                <props:multilineProperty name="templateComment" rows="5" cols="58" linkTitle="Template comment for JIRA:"/>
-            </div>
-        </td>
+      <th><label for="jiraServerUrl">Server URL:</label></th>
+      <td><props:textProperty name="jiraServerUrl" className="longField"/></td>
+    </tr>
+    <tr>
+      <th><label for="jiraUser">User:</label></th>
+      <td><props:textProperty name="jiraUser" /></td>
+    </tr>
+    <tr>
+      <th><label for="jiraPassword">Password:</label></th>
+      <td><props:passwordProperty name="jiraPassword"/></td>
+    </tr>
+    <tr>
+      <th>Security:</th>
+      <td>
+        <props:checkboxProperty name="jiraWindowsAuth"/>
+        <label for="jiraWindowsAuth">NTLM authentication</label>
+        <br>
+        <props:checkboxProperty name="enableSSLConnection"/>
+        <label for="enableSSLConnection">SSL connection</label>
+      </td>
+    </tr>
+    <!--<tr>
+        <span>Enable issue progressing:</span>
+        <props:checkboxProperty name="enableIssueProgressing"/>
+        <br>
+        <div id="jira.workflow">
+            <props:multilineProperty name="jiraWorkflow" rows="5" cols="58" linkTitle="Enter your JIRA workflow for issue progressing"/>
+        </div>
+    </tr>-->
+    <tr>
+      <th>Reporting settings:</th>
+      <td>
+        <props:checkboxProperty name="enableLinkToBuildPage"/>
+        <label for="enableLinkToBuildPage">Make link to TeamCity build page on success</label>
+        <br>
+        <props:checkboxProperty name="enableCommenting"/>
+        <label for="enableCommenting">Post comment to Jira issue</label>
+        <br>
+        <props:checkboxProperty name="enableTemplateComment"/>
+        <label for="enableTemplateComment">Enable comment template for Jira</label>
+        <div id="templateJiraComment">
+            <props:multilineProperty name="templateComment" rows="5" cols="58" linkTitle="Comment template:"/>
+        </div>
+      </td>
     </tr>
 </l:settingsGroup>
 <l:settingsGroup title="TeamCity Configuration">
     <tr>
-        <td>
-            <span>Server URL:</span>
-            <br>
-            <props:textProperty name="tcServerUrl" className="longField"/>
-            <br>
-            <span>User:</span>
-            <br>
-            <props:textProperty name="tcUser" />
-            <br>
-            <span>Password:</span>
-            <br>
-            <props:passwordProperty name="tcPassword"/>
-        </td>
+      <th><label for="tcServerUrl">Server URL:</label></th>
+      <td><props:textProperty name="tcServerUrl" className="longField"/></td>
+    </tr>
+    <tr>
+      <th><label for="tcUser">User:</label></th>
+      <td><props:textProperty name="tcUser" /></td>
+    </tr>
+    <tr>
+      <th><label for="tcPassword">Password:</label></th>
+      <td><props:passwordProperty name="tcPassword"/></td>
+    </tr>
+    <tr>
+      <th>Security:</th>
+      <td>
+        <props:checkboxProperty name="tcWindowsAuth"/>
+        <label for="tcWindowsAuth">NTLM authentication</label>
+      </td>
     </tr>
 </l:settingsGroup>
 
 <script type="text/javascript">
-    var checkBox = jQuery('#enableIssueProgressing');
+    /*var checkBox = jQuery('#enableIssueProgressing');
     checkBox.change(function(){
         if(jQuery(this).prop("checked")){
             BS.Util.show('jira.workflow');
@@ -90,7 +96,7 @@
     }
     else{
         BS.Util.hide('jira.workflow');
-    }
+    }*/
     var tplComment = jQuery('#enableTemplateComment');
     tplComment.change(function(){
         if(jQuery(this).prop("checked")){
@@ -106,25 +112,6 @@
     }
     else{
         BS.Util.hide('templateJiraComment');
-    }
-    var select = jQuery('[name="prop:issueIdPlace"]');
-    select.change(function(){
-        switch (select.val()){
-            case 'custom':
-                BS.Util.show('jira.issue.id');
-                break;
-            case 'teamcity':
-                BS.Util.hide('jira.issue.id');
-                break;
-        }
-    });
-    switch (select.val()){
-        case 'custom':
-            BS.Util.show('jira.issue.id');
-            break;
-        case 'teamcity':
-            BS.Util.hide('jira.issue.id');
-            break;
     }
     BS.VisibilityHandlers.updateVisibility('mainContent');
 </script>
