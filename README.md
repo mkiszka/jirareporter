@@ -1,7 +1,9 @@
+[![Build Status](https://travis-ci.com/allknower/jirareporter.svg?branch=master)](https://travis-ci.com/allknower/jirareporter)
+
 Plug-in is designed for sending build results from TeamCity in JIRA ticket and it is also possible to move the issue through your workflow. Report are sent as comments to the issue.
 
-[Download plugin](https://github.com/Myra-Security-GmbH/jirareporter/releases)
-[Source code](https://github.com/Myra-Security-GmbH/jirareporter)
+[Download plugin](https://github.com/allknower/jirareporter/releases)
+[Source code](https://github.com/allknower/jirareporter)
 
 ## The advantages
 
@@ -17,7 +19,7 @@ Plug-in is designed for sending build results from TeamCity in JIRA ticket and i
 
 3. Plug-in parameters:
 
-![pluginParams](http://gyazo.com/77caaea9ec007db89525b35f0ca7cea5.png)
+![pluginParams](https://github.com/allknower/jirareporter/blob/master/params.png)
 
 
 **Get issue from:**
@@ -66,12 +68,12 @@ Activate checkbox for editing template, and write yourself template of JIRA comm
 
 Also you have defined parameters:
 ```
-*status.build*, *build.type.name*, *tests.results*, *teamcity.server.url*, *build.id*, *build.type*.
+${build.id}, ${build.type}, ${build.name},  ${build.number}, ${build.status}, ${build.status.style}, ${build.weburl}, ${tests.results}
 ```
 
 Example:
 ```
-*build.type.name* : *status.build* 
-*test.results* 
+${build.type.name} : ${status.build}
+${test.results}
 Template example.
 ```
