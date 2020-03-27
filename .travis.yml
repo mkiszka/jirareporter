@@ -1,7 +1,7 @@
 language: java
 deploy:
   provider: releases
-  api_key: "GITHUB OAUTH TOKEN"
+  api_key: ${GITHUB_OAUTH_TOKEN}
   file: "target/jirareporter.zip"
   skip_cleanup: true
   on:
