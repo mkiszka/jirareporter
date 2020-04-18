@@ -14,21 +14,22 @@ Plug-in is designed for sending build results from TeamCity in JIRA ticket and i
 ## Settings
 
 1. Install plug-in in [ < TeamCity Data Directory >/plugins](http://confluence.jetbrains.com/display/TCD7/TeamCity+Data+Directory) and restart TeamCity server;
-2. Add Build Step JIRA Reporter to your configuration. 
-** Important!** In order to create an account Build Step must be the last step in hierarchy;
+2. Add Build Step JIRA Reporter to your configuration. 
+   ** Important!** In order to create an account Build Step must be the last step in hierarchy;
 
 3. Plug-in parameters:
 
 ![pluginParams](https://github.com/allknower/jirareporter/blob/master/params.png)
 
+~~**Get issue from:**~~
 
-**Get issue from:**
+~~Field, determining the method of getting id issue:~~
 
-Field, determining the method of getting id issue:
+~~_JIRA Reporter_ - connected id of the issue is indicated in the plug-in settings;~~
 
-_JIRA Reporter_ - connected id of the issue is indicated in the plug-in settings;
+~~_VCS Comment_ - issue id is taken from vcs commit,~~ 
 
-_VCS Comment_ - issue id is taken from vcs commit, for that it’s needed to set up integration of TeamCity, Administration -> Issue Tracker -> Create new connection.
+Identifiers are collected from the related issues of all builds until the last successful one. To do this, you need to configure TeamCity integration with your task tracker (Administration -> Problem Tracking -> Create a new connection).
 
 Example:
 
@@ -36,23 +37,24 @@ Example:
 git commit -m "fix for EXAMPLE-123"
 ```
 
+~~**Enable issue progressing:**~~
 
-**Enable issue progressing:**
+~~Movement of the issue through the workflow turns on depending on test results;~~
 
-Movement of the issue through the workflow turns on depending on test results;
+~~**Enter your JIRA workflow for issue progressing:**~~
 
-**Enter your JIRA workflow for issue progressing:**
+~~Appears when turning on Enable issue progressing;~~ 
 
-Appears when turning on Enable issue progressing; 
+~~Field to insert the requirements for issue movement through workflow.~~
 
-Field to insert the requirements for issue movement through workflow.
-
-Format for inserting requirements: 
+~~Format for inserting requirements:~~ 
 
 ```
 SUCCESS:In Progress-Resolve Issue,Closed-Deploy,In Testing-Close Issue;
 FAILURE:In Progress-Reopen Issue,In Testing-Reopen Issue,Closed-Reopen Issue;
 ```
+
+*This feature is temporarily disabled.*
 
 **Enable SSL connection:**
 
@@ -68,7 +70,14 @@ Activate checkbox for editing template, and write yourself template of JIRA comm
 
 Also you have defined parameters:
 ```
-${build.id}, ${build.type}, ${build.name},  ${build.number}, ${build.status}, ${build.status.style}, ${build.weburl}, ${tests.results}
+${build.id}
+${build.type}
+${build.name}
+${build.number}
+${build.status}
+${build.status.style}
+${build.weburl}
+${tests.results}
 ```
 
 Example:
