@@ -126,9 +126,9 @@ public class TeamCityXMLParser implements IBuildInfo
     {
         try
         {
-            if (!_prmsProvider.getTCWindowsAuth())
+           /* if (!_prmsProvider.getTCWindowsAuth())
                 xmlUrl = "/httpAuth" + xmlUrl;
-
+*/
             URL url = new URL(_tcBaseUrl + xmlUrl);
             URLConnection uc = url.openConnection();
             uc.connect();
