@@ -34,7 +34,7 @@ public class JIRABuildProcess implements BuildProcess
     @Override
     public void start() throws RunBuildException
     {
-        if (!_prmsProvider.isCommentingEnabled() && !_prmsProvider.isLinkToBuildPageEnabled())
+        if (!_prmsProvider.isAnyFeatureEnabled())
         {
             _logger.warning("All features are disabled. Processing was skipped.");
             return;

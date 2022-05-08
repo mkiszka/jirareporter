@@ -87,6 +87,10 @@ public class RunnerParamsProvider
 
     public boolean isLinkToBuildPageEnabled() {  return Boolean.parseBoolean(_props.getProperty("enableLinkToBuildPage")); }
 
+    public boolean isAnyFeatureEnabled() {
+        return isCommentingEnabled() || isLinkToBuildPageEnabled() || isProgressIssueEnabled();
+    }
+
     private String normalizeUrl(String url)
     {
         if (url.endsWith("/") || url.endsWith("\\"))
