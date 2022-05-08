@@ -7,43 +7,54 @@
     <version>1.0</version>
     <artifactId>jirareporter</artifactId>
     <packaging>jar</packaging>
-
     <repositories>
         <repository>
-            <id>jetbrains-all</id>
-            <name>Jetbrains Repo</name>
-            <url>http://repository.jetbrains.com/all</url>
-            <snapshots>
-                <enabled>true</enabled>
-                <updatePolicy>daily</updatePolicy>
-                <checksumPolicy>warn</checksumPolicy>
-            </snapshots>
-            <releases>
-                <enabled>true</enabled>
-                <checksumPolicy>warn</checksumPolicy>
-            </releases>
-        </repository>        
-        <repository>
-            <id>atlassian-public</id>
-            <name>Atlassian repo</name>
-            <url>https://m2proxy.atlassian.com/repository/public</url>
-            <snapshots>
-                <enabled>true</enabled>
-                <updatePolicy>daily</updatePolicy>
-                <checksumPolicy>warn</checksumPolicy>
-            </snapshots>
-            <releases>
-                <enabled>true</enabled>
-                <checksumPolicy>warn</checksumPolicy>
-            </releases>
+            <id>JetBrains</id>
+            <url>https://download.jetbrains.com/teamcity-repository</url>
         </repository>
-    </repositories>    
+    </repositories>
+    <pluginRepositories>
+        <pluginRepository>
+            <id>JetBrains</id>
+            <url>https://download.jetbrains.com/teamcity-repository</url>
+        </pluginRepository>
+    </pluginRepositories>
+<!--    <repositories>-->
+<!--        <repository>-->
+<!--            <id>jetbrains-all</id>-->
+<!--            <name>Jetbrains Repo</name>-->
+<!--            <url>http://repository.jetbrains.com/all</url>-->
+<!--            <snapshots>-->
+<!--                <enabled>true</enabled>-->
+<!--                <updatePolicy>daily</updatePolicy>-->
+<!--                <checksumPolicy>warn</checksumPolicy>-->
+<!--            </snapshots>-->
+<!--            <releases>-->
+<!--                <enabled>true</enabled>-->
+<!--                <checksumPolicy>warn</checksumPolicy>-->
+<!--            </releases>-->
+<!--        </repository>        -->
+<!--        <repository>-->
+<!--            <id>atlassian-public</id>-->
+<!--            <name>Atlassian repo</name>-->
+<!--            <url>https://m2proxy.atlassian.com/repository/public</url>-->
+<!--            <snapshots>-->
+<!--                <enabled>true</enabled>-->
+<!--                <updatePolicy>daily</updatePolicy>-->
+<!--                <checksumPolicy>warn</checksumPolicy>-->
+<!--            </snapshots>-->
+<!--            <releases>-->
+<!--                <enabled>true</enabled>-->
+<!--                <checksumPolicy>warn</checksumPolicy>-->
+<!--            </releases>-->
+<!--        </repository>-->
+<!--    </repositories>    -->
 
     <properties>    
         <maven.compiler.source>1.7</maven.compiler.source>
         <maven.compiler.target>1.7</maven.compiler.target>
 
-        <teamcity.version>9.0.3</teamcity.version>
+        <teamcity.version>2021.2</teamcity.version>
     </properties>
 
     <dependencies>
