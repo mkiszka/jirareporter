@@ -7,3 +7,5 @@
 *.iws
 dist
 **/*.swp
+#Ignore Intellij files.
+*.iml
