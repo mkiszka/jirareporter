@@ -4,8 +4,13 @@ import com.amirov.jirareporter.RunnerParamsProvider;
 import java.util.HashMap;
 import java.util.Map;
 
+
 public class JIRAConfig
 {
+    /**
+     * @Deprecated Use JIRAWorkflow:processWorkflow instead.
+     */
+    @Deprecated
     private static void processWorkflow(String buildStatus, String propStatus, Map<String, String> workFlowMap)
     {
         if(propStatus.contains(buildStatus))
@@ -21,22 +26,13 @@ public class JIRAConfig
             }
         }
     }
-/*
+    /**
+     * @Deprecated Use JIRAWorkflow:prepareJiraWorkflow instead.
+     */
+    @Deprecated
     public static Map<String, String> prepareJiraWorkflow(String buildStatus)
     {
-        Map<String, String> successWorkflowMap = new HashMap<String, String>();
-        Map<String, String> failureWorkflowMap = new HashMap<String, String>();
-        String [] statusCont = RunnerParamsProvider.getJiraWorkFlow().split(";");
-        for(String status : statusCont){
-            processWorkflow("SUCCESS", status, successWorkflowMap);
-            processWorkflow("FAILURE", status, failureWorkflowMap);
-        }
-        if(buildStatus.equals("SUCCESS")){
-            return successWorkflowMap;
-        }
-        else {
-            return failureWorkflowMap;
-        }
+        return null;
     }
-   */
+
 }
