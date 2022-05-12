@@ -1,91 +1,113 @@
 package com.amirov.jirareporter;
 
 import com.amirov.jirareporter.jira.JIRAClient;
+import com.amirov.jirareporter.jira.JIRAWorkflow;
 import com.amirov.jirareporter.teamcity.IBuildInfo;
-import com.atlassian.jira.rest.client.domain.Issue;
+import com.amirov.jirareporter.teamcity.TeamCityXMLParser;
+import com.atlassian.jira.rest.client.NullProgressMonitor;
+import com.atlassian.jira.rest.client.domain.*;
+import com.atlassian.jira.rest.client.domain.input.ComplexIssueInputFieldValue;
+import com.atlassian.jira.rest.client.domain.input.FieldInput;
+import com.atlassian.jira.rest.client.domain.input.TransitionInput;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jetbrains.buildServer.agent.BuildProgressLogger;
 
+import java.io.IOException;
 import java.net.URISyntaxException;
-import java.util.Collection;
+import java.util.*;
 
 public class Reporter
 {
     private final RunnerParamsProvider _prmsProvider;
     private final BuildProgressLogger _logger;
+    private final JIRAWorkflow _jiraWorkflow;
+    private final JIRAClient _jiraClient;
+    private final IBuildInfo _buildInfo;
+    private static final ObjectMapper mapper = new ObjectMapper();
 
-    public Reporter(RunnerParamsProvider prmsProvider)
-    {
+
+    public Reporter(RunnerParamsProvider prmsProvider,JIRAClient jiraClient, JIRAWorkflow jiraWorkflow,IBuildInfo buildInfo) throws URISyntaxException {
         _prmsProvider = prmsProvider;
         _logger = prmsProvider.getLogger();
+        _jiraClient = jiraClient;
+        _jiraWorkflow = jiraWorkflow;
+        _buildInfo = buildInfo;
     }
 
-    public void report(Collection<String> issueIds, IBuildInfo buildInfo) throws URISyntaxException
+    public void report(Collection<String> issueIds)
     {
-        String comment = buildInfo.buildCommentText();
+        String comment = _buildInfo.buildCommentText();
         _logger.message("Ready to report to JIRA. Message: " + comment);
 
-        JIRAClient jira = new JIRAClient(_prmsProvider);
         for (String issueId : issueIds)
         {
             _logger.message("Loading issue " + issueId);
-            final Issue issue = jira.getIssue(issueId);
+            final Issue issue = _jiraClient.getIssue(issueId);
             if (_prmsProvider.isCommentingEnabled())
             {
                 _logger.message("Adding comment...");
-                jira.addComment(issue, comment);
+                _jiraClient.addComment(issue, comment);
             }
 
             if (_prmsProvider.isLinkToBuildPageEnabled())
             {
                 _logger.message("Making link to TeamCity build page...");
-                String title = buildInfo.getBuildName() + " " + buildInfo.getBuildNumber();
-                jira.makeLink(issue, buildInfo.getWebUrl() + "&tab=artifacts", title);
+                String title = _buildInfo.getBuildName() + " " + _buildInfo.getBuildNumber();
+                _jiraClient.makeLink(issue, _buildInfo.getWebUrl() + "&tab=artifacts", title);
             }
         }
         _logger.message("Reporting completed!");
     }
 
-    /*
-    private static final ObjectMapper mapper = new ObjectMapper();
-    public void progressIssue() {
+
+    //private static final ObjectMapper mapper = new ObjectMapper();
+    public void transitionIssue(Collection<String> issueIds)
+    {
+        _logger.message("Ready to transition Issues." + _buildInfo.getBuildNumber());
+
         NullProgressMonitor pm = new NullProgressMonitor();
-        if(RunnerParamsProvider.isProgressIssueEnabled() == null){}
-        else if(RunnerParamsProvider.isProgressIssueEnabled().equals("true")){
-            String transitionName = JIRAConfig.prepareJiraWorkflow(parser.getBuildStatus()).get(getIssueStatus());
-            if (transitionName != null) {
-                //Get Transition
-                Transition transition = getTransitionByName(transitionName);
+        for (String issueId : issueIds) {
+            if (!_prmsProvider.isProgressIssueEnabled()) {
+            } else {
+                _logger.message("Transition " + _jiraClient.getIssue(issueId).getKey() + " has been started");
 
-                //Create New Field Input Updates
-                Resolution fixedResolution = getResolutionByName("Fixed");
-                Map resMap = Collections.EMPTY_MAP;
-                try {
-                    String resolutionString = mapper.writeValueAsString(fixedResolution);
-                    resMap = mapper.readValue(resolutionString, HashMap.class);
-                } catch (IOException e) {
-                    e.printStackTrace();
+                String transitionName = _jiraWorkflow.prepareJiraWorkflow(_buildInfo.getBuildStatus()).get(_jiraClient.getIssueStatus(issueId));
+                if (transitionName != null) {
+                    //Get Transition
+                    Transition transition = _jiraClient.getTransitionByName(issueId,transitionName);
+
+                    //Create New Field Input Updates
+                    Resolution resolution = _jiraClient.getResolutionByName("Done");
+                    Map resMap = Collections.EMPTY_MAP;
+                    try {
+                        String resolutionString = mapper.writeValueAsString(resolution);
+                        resMap = mapper.readValue(resolutionString, HashMap.class);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+
+                    ComplexIssueInputFieldValue complexIssueInputFieldValue = new ComplexIssueInputFieldValue(resMap);
+
+                    //Get Jira Version
+                /*    Map<String, Object> versionMap = new HashMap<>();
+                    Version version = getVersion(_buildInfo.getReleasedPomVersionString());
+                    versionMap.put("id", String.valueOf(version.getId()));
+                    versionMap.put("name", version.getName());
+                    ComplexIssueInputFieldValue versionComplexIssueInputFieldValue = new ComplexIssueInputFieldValue(versionMap);
+
+                    List<ComplexIssueInputFieldValue> fixVersionsComplex = new ArrayList<>();
+                    fixVersionsComplex.add(versionComplexIssueInputFieldValue);*/
+
+                    Collection<FieldInput> fieldInputs = Arrays.asList(new FieldInput("resolution", complexIssueInputFieldValue)/*, new FieldInput("fixVersions", fixVersionsComplex)*/);
+                    //Create final transition input to ship across the wire.
+                    final TransitionInput transitionInput = new TransitionInput(transition.getId(), fieldInputs, Comment.valueOf("This issue was released and closed via TeamCity Plugin."));
+                    //SHIP IT!!!
+                    _jiraClient.transition(issueId, transitionInput);
+
+                    _logger.message(_jiraClient.getIssue(issueId).getKey() + " has been transitioned to " + transition.getName() + "with resolution " + resolution.getName());
                 }
-
-                ComplexIssueInputFieldValue complexIssueInputFieldValue = new ComplexIssueInputFieldValue(resMap);
-
-                //Get Jira Version
-                Map<String, Object> versionMap = new HashMap<>();
-                Version version = getVersion(parser.getReleasedPomVersionString());
-                versionMap.put("id", String.valueOf(version.getId()));
-                versionMap.put("name", version.getName());
-                ComplexIssueInputFieldValue versionComplexIssueInputFieldValue = new ComplexIssueInputFieldValue(versionMap);
-
-                List<ComplexIssueInputFieldValue> fixVersionsComplex = new ArrayList<>();
-                fixVersionsComplex.add(versionComplexIssueInputFieldValue);
-
-                Collection<FieldInput> fieldInputs = Arrays.asList(new FieldInput("resolution", complexIssueInputFieldValue), new FieldInput("fixVersions", fixVersionsComplex));
-                //Create final transition input to ship across the wire.
-                final TransitionInput resolvedTransitionInput = new TransitionInput(transition.getId(), fieldInputs, Comment.valueOf("This issue was released and closed via TeamCity Plugin."));
-                //SHIP IT!!!
-                getRestClient().getIssueClient().transition(getIssue().getTransitionsUri(), resolvedTransitionInput, pm);
-
-                _logger.message(issueKey + " has been transitioned to Closed with resolution Fixed and Fix Version of " + version.getName());
             }
         }
-    }*/
+        _logger.message("Transitions completed!");
+    }
 }
