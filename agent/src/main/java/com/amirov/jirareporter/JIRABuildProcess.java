@@ -1,5 +1,7 @@
 package com.amirov.jirareporter;
 
+import com.amirov.jirareporter.jira.JIRAClient;
+import com.amirov.jirareporter.jira.JIRAWorkflow;
 import com.amirov.jirareporter.teamcity.TeamCityXMLParser;
 import jetbrains.buildServer.RunBuildException;
 import jetbrains.buildServer.agent.AgentRunningBuild;
@@ -34,7 +36,7 @@ public class JIRABuildProcess implements BuildProcess
     @Override
     public void start() throws RunBuildException
     {
-        if (!_prmsProvider.isCommentingEnabled() && !_prmsProvider.isLinkToBuildPageEnabled())
+        if (!_prmsProvider.isAnyFeatureEnabled())
         {
             _logger.warning("All features are disabled. Processing was skipped.");
             return;
@@ -51,8 +53,9 @@ public class JIRABuildProcess implements BuildProcess
             {
                 _logger.message("Issue ids: " + String.join(", ", issueIds));
 
-                Reporter reporter = new Reporter(_prmsProvider);
-                reporter.report(issueIds, parser);
+                Reporter reporter = new Reporter(_prmsProvider,new JIRAClient(_prmsProvider),new JIRAWorkflow(_prmsProvider),parser);
+                reporter.report(issueIds);
+                reporter.transitionIssue(issueIds);
             }
         }
         catch (Exception ex)

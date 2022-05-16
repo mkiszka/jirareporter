@@ -33,14 +33,16 @@
         <label for="enableSSLConnection">SSL connection</label>
       </td>
     </tr>
-    <!--<tr>
-        <span>Enable issue progressing:</span>
-        <props:checkboxProperty name="enableIssueProgressing"/>
-        <br>
-        <div id="jira.workflow">
-            <props:multilineProperty name="jiraWorkflow" rows="5" cols="58" linkTitle="Enter your JIRA workflow for issue progressing"/>
-        </div>
-    </tr>-->
+    <tr>
+        <th>Enable issue transitioning:</th>
+        <td>
+            <props:checkboxProperty name="enableIssueTransitioning"/>
+            <br>
+            <div id="jira.workflow">
+                <props:multilineProperty name="jiraWorkflow" rows="5" cols="58" linkTitle="Enter your JIRA workflow for issue transitioning"/>
+            </div>
+        </td>
+    </tr>
     <tr>
       <th>Reporting settings:</th>
       <td>
@@ -81,7 +83,7 @@
 </l:settingsGroup>
 
 <script type="text/javascript">
-    /*var checkBox = jQuery('#enableIssueProgressing');
+    var checkBox = jQuery('#enableIssueTransitioning');
     checkBox.change(function(){
         if(jQuery(this).prop("checked")){
             BS.Util.show('jira.workflow');
@@ -96,7 +98,7 @@
     }
     else{
         BS.Util.hide('jira.workflow');
-    }*/
+    }
     var tplComment = jQuery('#enableTemplateComment');
     tplComment.change(function(){
         if(jQuery(this).prop("checked")){

@@ -5,8 +5,12 @@ import com.atlassian.jira.rest.client.JiraRestClient;
 import com.atlassian.jira.rest.client.NullProgressMonitor;
 import com.atlassian.jira.rest.client.domain.Comment;
 import com.atlassian.jira.rest.client.domain.Issue;
+import com.atlassian.jira.rest.client.domain.Resolution;
+import com.atlassian.jira.rest.client.domain.Transition;
+import com.atlassian.jira.rest.client.domain.input.TransitionInput;
 import com.atlassian.jira.rest.client.internal.jersey.JerseyJiraRestClientFactory;
 import com.sun.jersey.client.apache.ApacheHttpClient;
+
 
 import java.lang.reflect.Field;
 import java.net.URI;
@@ -62,25 +66,25 @@ public class JIRAClient
         _remoteLinkClient.makeRemoteLink(issue.getKey(), url, title);
     }
 
-    /*
-    public static String getIssueStatus(){
-        return getIssue().getStatus().getName();
+
+    public String getIssueStatus(String issueId){
+        return getIssue(issueId).getStatus().getName();
     }
 
-    private static Iterable<Transition> getTransitions (){
-        return getRestClient().getIssueClient().getTransitions(getIssue().getTransitionsUri(), NPM);
+    private Iterable<Transition> getTransitions (String issueId){
+        return _client.getIssueClient().getTransitions(getIssue(issueId).getTransitionsUri(), NPM);
     }
-
-    private static Transition getTransition(String transitionName){
+/*
+    private Transition getTransition(String transitionName){
         return getTransitionByName(getTransitions(), transitionName);
-    }
-
+    }*/
+  /*
     public static TransitionInput getTransitionInput(String transitionName){
         TeamCityXMLParser parser = new TeamCityXMLParser();
         return new TransitionInput(getTransition(transitionName).getId(), Comment.valueOf(parser.getTestResultText()));
     }
-
-    private static Transition getTransitionByName(Iterable<Transition> transitions, String transitionName) {
+*/
+    private Transition getTransitionByName(Iterable<Transition> transitions, String transitionName) {
         for (Transition transition : transitions) {
             if (transition.getName().equals(transitionName)) {
                 return transition;
@@ -89,16 +93,16 @@ public class JIRAClient
         return null;
     }
 
-    public static Transition getTransitionByName(String transitionName) {
-        Iterable<Transition> transitions = getTransitions();
+    public Transition getTransitionByName(String issueId, String transitionName) {
+        Iterable<Transition> transitions = getTransitions(issueId);
         return getTransitionByName(transitions, transitionName);
     }
 
-    private static Iterable<Resolution> getResolutions() {
-        return getRestClient().getMetadataClient().getResolutions(NPM);
+    private Iterable<Resolution> getResolutions() {
+        return _client.getMetadataClient().getResolutions(NPM);
     }
 
-    public static Resolution getResolutionByName(String resolutionName) {
+    public Resolution getResolutionByName(String resolutionName) {
         Iterable<Resolution> resolutions = getResolutions();
         for (Resolution resolution : resolutions) {
             if (resolution.getName().equals(resolutionName)) {
@@ -107,7 +111,7 @@ public class JIRAClient
         }
         return null;
     }
-
+/*
     private static Version createVersion(String versionName, String projectKey) {
         //create new version
         VersionInput versionInput = new VersionInputBuilder(projectKey)
@@ -129,4 +133,8 @@ public class JIRAClient
         return createVersion(versionName, projectKey);
     }
     */
+
+    public void transition(String issueId, TransitionInput transitionInput) {
+        _client.getIssueClient().transition(getIssue(issueId),transitionInput,NPM);
+    }
 }
