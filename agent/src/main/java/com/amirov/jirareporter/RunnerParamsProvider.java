@@ -1,11 +1,14 @@
 package com.amirov.jirareporter;
 
 import jetbrains.buildServer.agent.BuildProgressLogger;
+import org.json.JSONObject;
+
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
 
 public class RunnerParamsProvider
 {
@@ -24,6 +27,15 @@ public class RunnerParamsProvider
         for (Map.Entry<String, String> entry : runnerParams.entrySet())
         {
             set(entry.getKey(), entry.getValue());
+        }
+    }
+
+    public RunnerParamsProvider(JSONObject runnerParams, BuildProgressLogger logger)
+    {
+        this(logger);
+        for (String key : runnerParams.keySet())
+        {
+            set(key, runnerParams.getString(key));
         }
     }
 

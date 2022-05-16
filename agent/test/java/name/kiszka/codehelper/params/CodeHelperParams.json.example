@@ -1,0 +1,21 @@
+{
+"agent.ownPort" : "9090",
+"artefacts.paths" : "",
+"enableCommenting" : "true",
+"enableIssueProgressing" : "true",
+"enableLinkToBuildPage" : "true",
+"enableSSLConnection" : "true",
+"jiraUser" : "jira user",
+"jiraPassword" : "jira password",
+"jiraServerUrl" : "https://jira.domain",
+"jiraWorkflow" : "SUCCESS:In Progress-Done,ToDo-In Progress;FAILURE:In Progress-Reopen Issue,In Testing-Reopen Issue,Closed-Reopen Issue;",
+"tcUser" : "teamcity user",
+"tcPassword" : "teamcity password",
+"tcServerUrl" : "https://teamcity.domain",
+"teamcity.build.checkoutDir" : "C:\\BuildAgent\\work\\b0f3dc02f4e91bb8",
+"teamcity.build.id" : "13001",
+"teamcity.build.workingDir" : "C:\\BuildAgent\\work\\b0f3dc02f4e91bb8",
+"teamcity.fail.exit.code" : "true",
+"teamcity.step.mode" : "default",
+"number" : "25" //This's id of teamcity build.  <- Remove this comment to use this file as json file.
+}

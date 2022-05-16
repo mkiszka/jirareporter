@@ -9,3 +9,4 @@ dist
 **/*.swp
 #Ignore Intellij files.
 *.iml
+/agent/test/java/name/kiszka/codehelper/params/CodeHelperParams.json
