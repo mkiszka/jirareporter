@@ -3,12 +3,10 @@ package com.amirov.jirareporter;
 import jetbrains.buildServer.agent.BuildProgressLogger;
 import org.json.JSONObject;
 
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Map;
 import java.util.Properties;
-import java.util.Set;
 
 public class RunnerParamsProvider
 {
@@ -87,7 +85,7 @@ public class RunnerParamsProvider
 
     public boolean getTCWindowsAuth() { return Boolean.parseBoolean(_props.getProperty("tcWindowsAuth")); }
 
-    public boolean isProgressIssueEnabled() { return Boolean.parseBoolean(_props.getProperty("enableIssueProgressing")); }
+    public boolean isTransitionIssueEnabled() { return Boolean.parseBoolean(_props.getProperty("enableIssueTransitioning")); }
 
     public String getBuildName() { return _props.getProperty("buildName"); }
 
@@ -100,7 +98,7 @@ public class RunnerParamsProvider
     public boolean isLinkToBuildPageEnabled() {  return Boolean.parseBoolean(_props.getProperty("enableLinkToBuildPage")); }
 
     public boolean isAnyFeatureEnabled() {
-        return isCommentingEnabled() || isLinkToBuildPageEnabled() || isProgressIssueEnabled();
+        return isCommentingEnabled() || isLinkToBuildPageEnabled() || isTransitionIssueEnabled();
     }
 
     private String normalizeUrl(String url)

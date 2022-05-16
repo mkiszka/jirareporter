@@ -3,7 +3,6 @@ package com.amirov.jirareporter;
 import com.amirov.jirareporter.jira.JIRAClient;
 import com.amirov.jirareporter.jira.JIRAWorkflow;
 import com.amirov.jirareporter.teamcity.IBuildInfo;
-import com.amirov.jirareporter.teamcity.TeamCityXMLParser;
 import com.atlassian.jira.rest.client.NullProgressMonitor;
 import com.atlassian.jira.rest.client.domain.*;
 import com.atlassian.jira.rest.client.domain.input.ComplexIssueInputFieldValue;
@@ -12,7 +11,6 @@ import com.atlassian.jira.rest.client.domain.input.TransitionInput;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jetbrains.buildServer.agent.BuildProgressLogger;
 
-import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.*;
 
@@ -67,7 +65,7 @@ public class Reporter
 
         NullProgressMonitor pm = new NullProgressMonitor();
         for (String issueId : issueIds) {
-            if (!_prmsProvider.isProgressIssueEnabled()) {
+            if (!_prmsProvider.isTransitionIssueEnabled()) {
             } else {
                 _logger.message("Transition " + _jiraClient.getIssue(issueId).getKey() + " has been started");
 

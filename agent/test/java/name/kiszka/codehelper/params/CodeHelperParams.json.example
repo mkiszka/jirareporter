@@ -2,7 +2,7 @@
 "agent.ownPort" : "9090",
 "artefacts.paths" : "",
 "enableCommenting" : "true",
-"enableIssueProgressing" : "true",
+"enableIssueTranistioning" : "true",
 "enableLinkToBuildPage" : "true",
 "enableSSLConnection" : "true",
 "jiraUser" : "jira user",

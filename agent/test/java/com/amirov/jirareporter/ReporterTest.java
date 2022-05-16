@@ -2,20 +2,16 @@ package com.amirov.jirareporter;
 
 import com.amirov.jirareporter.jira.JIRAClient;
 import com.amirov.jirareporter.jira.JIRAWorkflow;
-import com.amirov.jirareporter.teamcity.IBuildInfo;
 import com.amirov.jirareporter.teamcity.TeamCityXMLParser;
 import com.atlassian.jira.rest.client.domain.Issue;
 import com.atlassian.jira.rest.client.domain.Resolution;
 import com.atlassian.jira.rest.client.domain.Transition;
 import java.net.URI;
 import jetbrains.buildServer.agent.BuildProgressLogger;
-import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
-import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
@@ -26,7 +22,6 @@ import java.util.*;
 import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS;
 
 class ReporterTest {
 
@@ -54,7 +49,7 @@ class ReporterTest {
 
         BuildProgressLogger buildProgressLogger = Mockito.mock(BuildProgressLogger.class);
         Mockito.when(prmsProvider.getLogger()).thenReturn(buildProgressLogger);
-        Mockito.when(prmsProvider.isProgressIssueEnabled()).thenReturn(true);
+        Mockito.when(prmsProvider.isTransitionIssueEnabled()).thenReturn(true);
         Mockito.when(prmsProvider.getJiraWorkFlow()).thenAnswer(i ->  prmsProvider_getJiraWorkflow);
 
         Mockito.when(issue.getKey()).thenReturn("TEST-321","TEST-318","KOM-2246");

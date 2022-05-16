@@ -34,12 +34,12 @@
       </td>
     </tr>
     <tr>
-        <th>Enable issue progressing:</th>
+        <th>Enable issue transitioning:</th>
         <td>
-            <props:checkboxProperty name="enableIssueProgressing"/>
+            <props:checkboxProperty name="enableIssueTransitioning"/>
             <br>
             <div id="jira.workflow">
-                <props:multilineProperty name="jiraWorkflow" rows="5" cols="58" linkTitle="Enter your JIRA workflow for issue progressing"/>
+                <props:multilineProperty name="jiraWorkflow" rows="5" cols="58" linkTitle="Enter your JIRA workflow for issue transitioning"/>
             </div>
         </td>
     </tr>
@@ -83,7 +83,7 @@
 </l:settingsGroup>
 
 <script type="text/javascript">
-    var checkBox = jQuery('#enableIssueProgressing');
+    var checkBox = jQuery('#enableIssueTransitioning');
     checkBox.change(function(){
         if(jQuery(this).prop("checked")){
             BS.Util.show('jira.workflow');

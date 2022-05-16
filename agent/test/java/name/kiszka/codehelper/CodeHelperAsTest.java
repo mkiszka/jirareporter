@@ -35,7 +35,7 @@ public class CodeHelperAsTest {
 //            put("agent.ownPort","9090");
 //            put("artefacts.paths","");
 //            put("enableCommenting","true");
-//            put("enableIssueProgressing","true");
+//            put("enableIssueTransitioning","true");
 //            put("enableLinkToBuildPage","true");
 //            put("enableSSLConnection","true");
 //            put("jiraUser","your jira user");
