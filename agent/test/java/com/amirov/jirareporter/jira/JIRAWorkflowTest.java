@@ -22,7 +22,8 @@ class JIRAWorkflowTest {
 
         return Stream.of(
                 Arguments.of("SUCCESS:In Progress-Done,ToDo-In Progress;\nFAILURE:In Progress-Reopen Issue,In Testing-Reopen Issue,Closed-Reopen Issue;","SUCCESS",new HashMap<String,String>() {{ put("In Progress","Done"); put("ToDo","In Progress"); }}),
-                Arguments.of("SUCCESS:In Progress-Done,ToDo-In Progress;\nFAILURE:In Progress-Reopen Issue,In Testing-Reopen Issue,Closed-Reopen Issue;","FAILURE",new HashMap<String,String>() {{ put("In Progress","Reopen Issue"); put("In Testing","Reopen Issue"); put("Closed","Reopen Issue"); }})
+                Arguments.of("SUCCESS:In Progress-Done,ToDo-In Progress;\nFAILURE:In Progress-Reopen Issue,In Testing-Reopen Issue,Closed-Reopen Issue;","FAILURE",new HashMap<String,String>() {{ put("In Progress","Reopen Issue"); put("In Testing","Reopen Issue"); put("Closed","Reopen Issue"); }}),
+                Arguments.of("SUCCESS:In Progress-Done,ToDo-In Progress;\nFAILURE:In Progress-Reopen Issue,In Testing-Reopen Issue,Closed-Reopen Issue;","UNEXIST_STATUS",null)
         );
     }
     @ParameterizedTest
@@ -39,8 +40,12 @@ class JIRAWorkflowTest {
 
 
         //Assert
-        for (Map.Entry<String,String> entry: expectedResult.entrySet()) {
-            assertThat(result, hasEntry(entry.getKey(),entry.getValue()));
+        if( expectedResult == null) {
+            assertNull(result);
+        } else {
+            for (Map.Entry<String, String> entry : expectedResult.entrySet()) {
+                assertThat(result, hasEntry(entry.getKey(), entry.getValue()));
+            }
         }
 
     }

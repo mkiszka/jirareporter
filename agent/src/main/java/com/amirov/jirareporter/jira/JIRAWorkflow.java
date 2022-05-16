@@ -13,37 +13,32 @@ public class JIRAWorkflow
         this.prmsProvider = prmsProvider;
     }
 
-    private void processWorkflow(String buildStatus, String propStatus, Map<String, String> workFlowMap)
+    private HashMap<String, String> processWorkflow(String buildStatus, String propStatus )
     {
-        if(propStatus.contains(buildStatus))
-        {
-            String [] progressSteps = propStatus.split(":");
-            String progressStep = progressSteps[progressSteps.length-1];
-            String [] transitions = progressStep.split(",");
-            for(String transition : transitions){
-                String [] steps = transition.split("-");
-                String key = steps[steps.length-2];
-                String value = steps[steps.length-1];
-                workFlowMap.put(key, value);
-            }
+
+        HashMap<String, String> workFlowMap = new HashMap<String, String>();
+
+        String [] progressSteps = propStatus.split(":");
+        String progressStep = progressSteps[progressSteps.length-1];
+        String [] transitions = progressStep.split(",");
+        for(String transition : transitions){
+            String [] steps = transition.split("-");
+            String key = steps[steps.length-2];
+            String value = steps[steps.length-1];
+            workFlowMap.put(key, value);
         }
+        return workFlowMap;
     }
 
     public Map<String, String> prepareJiraWorkflow(String buildStatus)
     {
-        Map<String, String> successWorkflowMap = new HashMap<String, String>();
-        Map<String, String> failureWorkflowMap = new HashMap<String, String>();
-        String [] statusCont = prmsProvider.getJiraWorkFlow().split(";");
-        for(String status : statusCont){
-            processWorkflow("SUCCESS", status, successWorkflowMap);
-            processWorkflow("FAILURE", status, failureWorkflowMap);
+        String [] transitionsOnStatusBuild = prmsProvider.getJiraWorkFlow().split(";");
+        for(String transition : transitionsOnStatusBuild){
+            if(transition.contains(buildStatus)) {
+                return processWorkflow(buildStatus,transition);
+            }
         }
-        if(buildStatus.equals("SUCCESS")){
-            return successWorkflowMap;
-        }
-        else {
-            return failureWorkflowMap;
-        }
+        return null;
     }
 
 }
