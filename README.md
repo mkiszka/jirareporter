@@ -19,7 +19,7 @@ Plug-in is designed for sending build results from TeamCity in JIRA ticket and i
 
 3. Plug-in parameters:
 
-![pluginParams](https://github.com/allknower/jirareporter/blob/master/params.png)
+![pluginParams](./params.png)
 
 ~~**Get issue from:**~~
 
@@ -29,32 +29,30 @@ Plug-in is designed for sending build results from TeamCity in JIRA ticket and i
 
 ~~_VCS Comment_ - issue id is taken from vcs commit,~~ 
 
-Identifiers are collected from the related issues of all builds until the last successful one. To do this, you need to configure TeamCity integration with your task tracker (Administration -> Problem Tracking -> Create a new connection).
+~~Identifiers are collected from the related issues of all builds until the last successful one. To do this, you need to configure TeamCity integration with your task tracker (Administration -> Problem Tracking -> Create a new connection).~~
 
-Example:
+~~Example:~~
 
 ```
 git commit -m "fix for EXAMPLE-123"
 ```
 
-~~**Enable issue progressing:**~~
+**Enable issue transition:**
 
-~~Movement of the issue through the workflow turns on depending on test results;~~
+Movement of the issue through the workflow turns on depending on test results;
 
-~~**Enter your JIRA workflow for issue progressing:**~~
+**Enter your JIRA workflow for issue transitioning:**
 
-~~Appears when turning on Enable issue progressing;~~ 
+Appears when turning on Enable issue transitioning; 
 
-~~Field to insert the requirements for issue movement through workflow.~~
+Field to insert the requirements for issue movement through workflow.
 
-~~Format for inserting requirements:~~ 
+Format for inserting requirements: 
 
 ```
 SUCCESS:In Progress-Resolve Issue,Closed-Deploy,In Testing-Close Issue;
 FAILURE:In Progress-Reopen Issue,In Testing-Reopen Issue,Closed-Reopen Issue;
 ```
-
-*This feature is temporarily disabled.*
 
 **Enable SSL connection:**
 
