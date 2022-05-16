@@ -1,9 +1,7 @@
-[![Build Status](https://travis-ci.com/allknower/jirareporter.svg?branch=master)](https://travis-ci.com/allknower/jirareporter)
-
 Plug-in is designed for sending build results from TeamCity in JIRA ticket and it is also possible to move the issue through your workflow. Report are sent as comments to the issue.
 
-[Download plugin](https://github.com/allknower/jirareporter/releases)
-[Source code](https://github.com/allknower/jirareporter)
+[Download plugin](https://github.com/mkiszka/jirareporter/releases)
+[Source code](https://github.com/mkiszka/jirareporter)
 
 ## The advantages
 
