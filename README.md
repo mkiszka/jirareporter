@@ -45,10 +45,12 @@ Appears when turning on Enable issue transitioning; 
 
 Field to insert the requirements for issue movement through workflow.
 
+If you need to set the resolution after the transition, the resolution name can be defined as Resolution[\<resolution name\>] as the third parameter of the transition rule
+
 Format for inserting requirements: 
 
 ```
-SUCCESS:In Progress-Resolve Issue,Closed-Deploy,In Testing-Close Issue;
+SUCCESS:In Progress-Resolve Issue-Resolution[Fixed],Closed-Deploy,In Testing-Close Issue;
 FAILURE:In Progress-Reopen Issue,In Testing-Reopen Issue,Closed-Reopen Issue;
 ```
 
