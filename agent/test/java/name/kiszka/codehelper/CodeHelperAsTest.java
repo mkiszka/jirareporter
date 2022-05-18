@@ -13,6 +13,7 @@ import org.json.JSONObject;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.net.URISyntaxException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Scanner;
 
@@ -67,8 +68,9 @@ public class CodeHelperAsTest {
 
         TeamCityXMLParser parser = new TeamCityXMLParser(prmsProvider);
 
-        Collection<String> issueIds = parser.getIssueKeys(); //getIssueKeys has to be invoked, there _buildData is set and it's necessary to use TeamCityXMLParser.
-
+        //Collection<String> issueIds = parser.getIssueKeys(); //getIssueKeys has to be invoked, there _buildData is set and it's necessary to use TeamCityXMLParser.
+        ArrayList<String> issueIds = new ArrayList<String>();
+        issueIds.add("TEST-322");
         //Act
         try {
             Reporter reporter = new Reporter(prmsProvider, new JIRAClient(prmsProvider),new JIRAWorkflow(prmsProvider),parser);
