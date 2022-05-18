@@ -69,15 +69,16 @@ public class Reporter
             } else {
                 _logger.message("Transition " + _jiraClient.getIssue(issueId).getKey() + " has been started");
 
-                Map<String, String> statusNames = _jiraWorkflow.prepareJiraWorkflow(_buildInfo.getBuildStatus());
+                Issue issue = _jiraClient.getIssue(issueId);
+                Map<String, String> statusNames = null;//  _jiraWorkflow.prepareJiraWorkflow(_buildInfo.getBuildStatus());
                 for (String statusName: statusNames.keySet()  ) {
 
-                    if (statusName.equals(_jiraClient.getIssueStatus(issueId))) {
+                    if (statusName.equals(issue.getStatus().getName())) {
                         String transitionName = statusNames.get(statusName);
                         //Get Transition
                         Transition transition = _jiraClient.getTransitionByName(issueId, transitionName);
                         if (transition == null) {
-                            _logger.message("There is no possibility to transition issue from " + _jiraClient.getIssueStatus(issueId) + " to " + transitionName);
+                            _logger.message("There is no possibility to transition issue from " + issue.getStatus().getName() + " to " + transitionName);
                         } else {
                             //Create New Field Input Updates
                             Resolution resolution = _jiraClient.getResolutionByName("Done"); //TODO possibility to enable this
