@@ -76,58 +76,62 @@ public class Reporter
                     Map<String, JIRATransitionParams> transitionDefinitions = null;
 
                     transitionDefinitions = _jiraWorkflow.prepareJiraWorkflow(_buildInfo.getBuildStatus());
+                    if(transitionDefinitions != null) {
+                        for (String statusName: transitionDefinitions.keySet()  ) {
 
-                    for (String statusName: transitionDefinitions.keySet()  ) {
-
-                        if (statusName.equals(issue.getStatus().getName())) {
-                            JIRATransitionParams transitionParams = transitionDefinitions.get(statusName);
-                            String transitionName = transitionParams.getTransitionName();
-                            //Get Transition
-                            Transition transition = _jiraClient.getTransitionByName(issueId, transitionName);
-
-                            if (transition == null) {
-                                _logger.message("There is no possibility to transition issue from " + issue.getStatus().getName() + " to " + transitionName);
-                            } else {
-                                //Create New Field Input Updates
+                            if (statusName.equals(issue.getStatus().getName())) {
+                                JIRATransitionParams transitionParams = transitionDefinitions.get(statusName);
+                                String transitionName = transitionParams.getTransitionName();
+                                //Get Transition
+                                Transition transition = _jiraClient.getTransitionByName(issueId, transitionName);
                                 Collection<FieldInput> fieldInputs = new ArrayList<FieldInput>();
 
-                                String resolutionName = transitionParams.getResolutionName();
-                                if(!resolutionName.isEmpty()) {
-                                    Resolution resolution = _jiraClient.getResolutionByName(transitionParams.getResolutionName());
-                                    Map resMap = Collections.EMPTY_MAP;
-                                    try {
-                                        String resolutionString = mapper.writeValueAsString(resolution);
-                                        resMap = mapper.readValue(resolutionString, HashMap.class);
-                                    } catch (Exception e) {
-                                        e.printStackTrace();
+                                if (transition == null) {
+                                    _logger.message("There is no possibility to transition issue from " + issue.getStatus().getName() + " to " + transitionName);
+                                } else {
+                                    //Create New Field Input Updates
+
+                                    String resolutionName = transitionParams.getResolutionName();
+                                    if(resolutionName != null &&
+                                            !resolutionName.isEmpty()) {
+                                        Resolution resolution = _jiraClient.getResolutionByName(transitionParams.getResolutionName());
+                                        Map resMap = Collections.EMPTY_MAP;
+                                        try {
+                                            String resolutionString = mapper.writeValueAsString(resolution);
+                                            resMap = mapper.readValue(resolutionString, HashMap.class);
+                                        } catch (Exception e) {
+                                            e.printStackTrace();
+                                        }
+
+                                        ComplexIssueInputFieldValue complexIssueInputFieldValue = new ComplexIssueInputFieldValue(resMap);
+                                        fieldInputs.add(new FieldInput("resolution", complexIssueInputFieldValue));
                                     }
 
-                                    ComplexIssueInputFieldValue complexIssueInputFieldValue = new ComplexIssueInputFieldValue(resMap);
-                                    fieldInputs.add(new FieldInput("resolution", complexIssueInputFieldValue));
+                                    //Get Jira Version
+                                /*    Map<String, Object> versionMap = new HashMap<>();
+                                    Version version = getVersion(_buildInfo.getReleasedPomVersionString());
+                                    versionMap.put("id", String.valueOf(version.getId()));
+                                    versionMap.put("name", version.getName());
+                                    ComplexIssueInputFieldValue versionComplexIssueInputFieldValue = new ComplexIssueInputFieldValue(versionMap);
+
+                                    List<ComplexIssueInputFieldValue> fixVersionsComplex = new ArrayList<>();
+                                    fixVersionsComplex.add(versionComplexIssueInputFieldValue);
+                                    fieldInputs.add(new FieldInput("fixVersions", fixVersionsComplex));
+                                    */
+
+                                    //Create final transition input to ship across the wire.
+                                    final TransitionInput transitionInput = new TransitionInput(transition.getId(), fieldInputs, Comment.valueOf("This issue was released and closed via TeamCity Plugin."));
+
+                                    //SHIP IT!!!
+                                    _jiraClient.transition(issueId, transitionInput);
+
+                                    _logger.message(_jiraClient.getIssue(issueId).getKey() + " has been transitioned to " + transition.getName() + ((resolutionName == null || resolutionName.isEmpty()) ? "with no resolution" : " with resolution " + resolutionName) + ".");
                                 }
-
-                                //Get Jira Version
-                            /*    Map<String, Object> versionMap = new HashMap<>();
-                                Version version = getVersion(_buildInfo.getReleasedPomVersionString());
-                                versionMap.put("id", String.valueOf(version.getId()));
-                                versionMap.put("name", version.getName());
-                                ComplexIssueInputFieldValue versionComplexIssueInputFieldValue = new ComplexIssueInputFieldValue(versionMap);
-
-                                List<ComplexIssueInputFieldValue> fixVersionsComplex = new ArrayList<>();
-                                fixVersionsComplex.add(versionComplexIssueInputFieldValue);
-                                fieldInputs.add(new FieldInput("fixVersions", fixVersionsComplex));
-                                */
-
-                                //Create final transition input to ship across the wire.
-                                final TransitionInput transitionInput = new TransitionInput(transition.getId(), fieldInputs, Comment.valueOf("This issue was released and closed via TeamCity Plugin."));
-
-                                //SHIP IT!!!
-                                _jiraClient.transition(issueId, transitionInput);
-
-                                _logger.message(_jiraClient.getIssue(issueId).getKey() + " has been transitioned to " + transition.getName() + (resolutionName.isEmpty() ? "with no resolution" : " with resolution " + resolutionName));
+                            } else {
+                                _logger.message(_jiraClient.getIssue(issueId).getKey() + " hasn't been transitioned.");
                             }
                         }
-                    }
+                     }
                 }
             }
             _logger.message("Transitions completed!");
