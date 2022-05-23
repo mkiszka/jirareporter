@@ -42,19 +42,22 @@ public class Reporter
 
         for (String issueId : issueIds)
         {
-            _logger.message("Loading issue " + issueId);
-            final Issue issue = _jiraClient.getIssue(issueId);
-            if (_prmsProvider.isCommentingEnabled())
-            {
-                _logger.message("Adding comment...");
-                _jiraClient.addComment(issue, comment);
-            }
+            try {
+                _logger.message("Loading issue " + issueId);
+                final Issue issue = _jiraClient.getIssue(issueId);
+                if (_prmsProvider.isCommentingEnabled()) {
+                    _logger.message("Adding comment...");
+                    _jiraClient.addComment(issue, comment);
+                }
 
-            if (_prmsProvider.isLinkToBuildPageEnabled())
-            {
-                _logger.message("Making link to TeamCity build page...");
-                String title = _buildInfo.getBuildName() + " " + _buildInfo.getBuildNumber();
-                _jiraClient.makeLink(issue, _buildInfo.getWebUrl() + "&tab=artifacts", title);
+                if (_prmsProvider.isLinkToBuildPageEnabled()) {
+                    _logger.message("Making link to TeamCity build page...");
+                    String title = _buildInfo.getBuildName() + " " + _buildInfo.getBuildNumber();
+                    _jiraClient.makeLink(issue, _buildInfo.getWebUrl() + "&tab=artifacts", title);
+                }
+
+            }catch (Exception e) {
+                throw e;
             }
         }
         _logger.message("Reporting completed!");

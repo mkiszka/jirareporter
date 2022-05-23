@@ -25,6 +25,69 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class ReporterTest {
 
+    static Stream<Arguments> generateData_Report() {
+
+
+        return Stream.of(
+                Arguments.of("SUCCESS:In Progress-Done,ToDo-In Progress;\nFAILURE:In Progress-Reopen Issue,In Testing-Reopen Issue,Closed-Reopen Issue;","SUCCESS",3),
+                Arguments.of("SUCCESS:In Progress-Done,ToDo-In Progress;\nFAILURE:In Progress-Reopen Issue,In Testing-Reopen Issue,Closed-Reopen Issue;","FAILURE",3),
+                Arguments.of("SUCCESS:In Progress-Done,ToDo-In Progress;\nFAILURE:In Testing-Reopen Issue,Closed-Reopen Issue;","FAILURE",0)
+        );
+    }
+
+    @ExtendWith(MockitoExtension.class)
+    @ParameterizedTest
+    @MethodSource("generateData_Report")
+    @MockitoSettings(strictness = Strictness.LENIENT)
+    void ReportTest(String prmsProvider_getJiraWorkflow,String buildStatus, int jiraClient_tranistion_wantedNumberOfInvokation) throws URISyntaxException {
+        //Arrange
+        RunnerParamsProvider prmsProvider = Mockito.mock(RunnerParamsProvider.class);
+        JIRAClient jiraClient = new JIRAClient(prmsProvider);
+        TeamCityXMLParser teamCityXMLParser = Mockito.mock(TeamCityXMLParser.class);
+        Issue issue = Mockito.mock(Issue.class);
+        Transition transition = Mockito.mock(Transition.class);
+
+        BuildProgressLogger buildProgressLogger = Mockito.mock(BuildProgressLogger.class);
+        Mockito.when(prmsProvider.getLogger()).thenReturn(buildProgressLogger);
+        Mockito.when(prmsProvider.isTransitionIssueEnabled()).thenReturn(true);
+        Mockito.when(prmsProvider.getJiraWorkFlow()).thenAnswer(i ->  prmsProvider_getJiraWorkflow);
+
+        Mockito.when(issue.getKey()).thenReturn("PP-5");
+
+//        Resolution resolution = null;
+//        try {
+//            resolution = new Resolution( new URI("https://jira.domain/rest/api/2/resolution/6"),"Done","The task is done.");
+//        } catch (URISyntaxException e) {
+//            e.printStackTrace();
+//            assertTrue(false,"There should be no exception.");
+//
+//        }
+
+       // Mockito.when(jiraClient.getIssue(Mockito.any())).thenReturn(issue);
+        //Mockito.when(jiraClient.getIssueStatus(Mockito.anyString())).thenReturn("In Progress");
+//        Mockito.when(jiraClient.getTransitionByName(Mockito.anyString(),Mockito.any())).thenReturn(transition);
+//        Mockito.when(jiraClient.getResolutionByName(Mockito.anyString())).thenReturn(resolution);
+
+        Mockito.when(teamCityXMLParser.getBuildNumber()).thenReturn("25");
+        Mockito.when(teamCityXMLParser.getBuildStatus()).thenReturn(buildStatus);
+
+
+
+        JIRAWorkflow jiraWorkflow = new JIRAWorkflow(prmsProvider);
+
+        Collection<String> issueIds = Arrays.asList(new String[] {"PP-5"});
+
+        //Act
+        try {
+            Reporter reporter = new Reporter(prmsProvider, jiraClient, jiraWorkflow, teamCityXMLParser);
+            reporter.report(issueIds);
+        } catch (URISyntaxException e) {
+            e.printStackTrace();
+            assertTrue(false,"There should be no exception.");
+        }
+        //Assert
+    }
+
     static Stream<Arguments> generateData_TransitionIssue() {
 
 
@@ -39,7 +102,7 @@ class ReporterTest {
     @ParameterizedTest
     @MethodSource("generateData_TransitionIssue")
     @MockitoSettings(strictness = Strictness.LENIENT)
-    void TransitionIssue(String prmsProvider_getJiraWorkflow,String buildStatus, int jiraClient_tranistion_wantedNumberOfInvokation) {
+    void TransitionIssueTest(String prmsProvider_getJiraWorkflow,String buildStatus, int jiraClient_tranistion_wantedNumberOfInvokation) {
         //Arrange
         RunnerParamsProvider prmsProvider = Mockito.mock(RunnerParamsProvider.class);
         JIRAClient jiraClient = Mockito.mock(JIRAClient.class);

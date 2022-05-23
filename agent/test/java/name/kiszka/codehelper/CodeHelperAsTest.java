@@ -8,6 +8,7 @@ import com.amirov.jirareporter.teamcity.TeamCityXMLParser;
 import jetbrains.buildServer.agent.BuildProgressLogger;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.json.JSONObject;
 import java.io.File;
@@ -24,6 +25,48 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * This is a helper to discover how the Jira API and TeamCity API work (on real data).
  */
 public class CodeHelperAsTest {
+    @ExtendWith(MockitoExtension.class)
+    @org.junit.jupiter.api.Test
+    void codeReportHelper(@Mock BuildProgressLogger _logger) throws FileNotFoundException  {
+
+        File jsonTCParams = new File("test/java/name/kiszka/codehelper/params/CodeHelperParams.json");
+        if(!jsonTCParams.exists()) {
+            assertTrue(true);
+        }
+        String jsonString = new Scanner(jsonTCParams).useDelimiter("\\Z").next();
+        JSONObject providerParameters = new JSONObject(jsonString);
+
+
+        RunnerParamsProvider prmsProvider = new RunnerParamsProvider(providerParameters, _logger);
+        prmsProvider.set("build.type.id", "KomKOD_sandbox"); //system.teamcity.buildType.id
+        prmsProvider.set("buildName", "sandbox"); //to musi być prawdziwa nazwa projektu budjącego
+
+        //TeamCityXMLParser parteamCityXMLParserser = new TeamCityXMLParser(prmsProvider);
+        TeamCityXMLParser teamCityXMLParser = Mockito.mock(TeamCityXMLParser.class,Mockito.withSettings().useConstructor(prmsProvider));
+        Mockito.when(teamCityXMLParser.buildCommentText()).thenCallRealMethod();
+        Mockito.when(teamCityXMLParser.getArtifactHref()).thenCallRealMethod();
+        Mockito.when(teamCityXMLParser.getArtifactName()).thenCallRealMethod();
+        Mockito.when(teamCityXMLParser.getBuildHref()).thenCallRealMethod();
+        Mockito.when(teamCityXMLParser.getBuildId()).thenCallRealMethod();
+        Mockito.when(teamCityXMLParser.getBuildName()).thenCallRealMethod();
+        Mockito.when(teamCityXMLParser.getBuildStatus()).thenReturn("SUCCESS");
+        Mockito.when(teamCityXMLParser.getIssueKeys()).thenCallRealMethod();
+        Mockito.when(teamCityXMLParser.getBuildName()).thenReturn("Sandbox" );
+        Mockito.when(teamCityXMLParser.getBuildNumber()).thenReturn("32" );
+        Mockito.when(teamCityXMLParser.getWebUrl()).thenReturn("https://example.domain.com" );
+
+        //Collection<String> issueIds = parser.getIssueKeys(); //getIssueKeys has to be invoked, there _buildData is set and it's necessary to use TeamCityXMLParser.
+        ArrayList<String> issueIds = new ArrayList<String>();
+        issueIds.add("PP-5");
+        //Act
+        try {
+            Reporter reporter = new Reporter(prmsProvider, new JIRAClient(prmsProvider),new JIRAWorkflow(prmsProvider),teamCityXMLParser);
+            reporter.report(issueIds);
+        } catch (URISyntaxException e) {
+            assertTrue(false,"There should be no exception.");
+        }
+        //Assert
+    }
     @ExtendWith(MockitoExtension.class)
     @org.junit.jupiter.api.Test
     void codeHelper(@Mock BuildProgressLogger _logger) throws FileNotFoundException  {
