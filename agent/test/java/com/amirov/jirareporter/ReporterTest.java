@@ -8,6 +8,7 @@ import com.atlassian.jira.rest.client.domain.Resolution;
 import com.atlassian.jira.rest.client.domain.Transition;
 import java.net.URI;
 import jetbrains.buildServer.agent.BuildProgressLogger;
+import name.kiszka.jirareporter.jira.JIRAProcessExceptions;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -46,6 +47,7 @@ class ReporterTest {
         TeamCityXMLParser teamCityXMLParser = Mockito.mock(TeamCityXMLParser.class);
         Issue issue = Mockito.mock(Issue.class);
         Transition transition = Mockito.mock(Transition.class);
+        BuildProgressLogger logger = Mockito.mock(BuildProgressLogger.class);
 
         BuildProgressLogger buildProgressLogger = Mockito.mock(BuildProgressLogger.class);
         Mockito.when(prmsProvider.getLogger()).thenReturn(buildProgressLogger);
@@ -79,7 +81,7 @@ class ReporterTest {
 
         //Act
         try {
-            Reporter reporter = new Reporter(prmsProvider, jiraClient, jiraWorkflow, teamCityXMLParser);
+            Reporter reporter = new Reporter(prmsProvider, jiraClient, jiraWorkflow, teamCityXMLParser,new JIRAProcessExceptions(logger));
             reporter.report(issueIds);
         } catch (URISyntaxException e) {
             e.printStackTrace();
@@ -109,6 +111,7 @@ class ReporterTest {
         TeamCityXMLParser teamCityXMLParser = Mockito.mock(TeamCityXMLParser.class);
         Issue issue = Mockito.mock(Issue.class);
         Transition transition = Mockito.mock(Transition.class);
+        BuildProgressLogger logger = Mockito.mock(BuildProgressLogger.class);
 
         BuildProgressLogger buildProgressLogger = Mockito.mock(BuildProgressLogger.class);
         Mockito.when(prmsProvider.getLogger()).thenReturn(buildProgressLogger);
@@ -142,7 +145,7 @@ class ReporterTest {
 
         //Act
         try {
-            Reporter reporter = new Reporter(prmsProvider, jiraClient, jiraWorkflow, teamCityXMLParser);
+            Reporter reporter = new Reporter(prmsProvider, jiraClient, jiraWorkflow, teamCityXMLParser,new JIRAProcessExceptions(logger));
             reporter.transitionIssue(issueIds);
         } catch (URISyntaxException e) {
             e.printStackTrace();

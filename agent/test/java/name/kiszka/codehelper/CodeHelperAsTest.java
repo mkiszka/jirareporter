@@ -6,6 +6,7 @@ import com.amirov.jirareporter.jira.JIRAClient;
 import com.amirov.jirareporter.jira.JIRAWorkflow;
 import com.amirov.jirareporter.teamcity.TeamCityXMLParser;
 import jetbrains.buildServer.agent.BuildProgressLogger;
+import name.kiszka.jirareporter.jira.JIRAProcessExceptions;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
@@ -53,14 +54,15 @@ public class CodeHelperAsTest {
         Mockito.when(teamCityXMLParser.getIssueKeys()).thenCallRealMethod();
         Mockito.when(teamCityXMLParser.getBuildName()).thenReturn("Sandbox" );
         Mockito.when(teamCityXMLParser.getBuildNumber()).thenReturn("32" );
-        Mockito.when(teamCityXMLParser.getWebUrl()).thenReturn("https://example.domain.com" );
+        Mockito.when(teamCityXMLParser.getWebUrl()).thenReturn("https://example.domain.com/" );
 
         //Collection<String> issueIds = parser.getIssueKeys(); //getIssueKeys has to be invoked, there _buildData is set and it's necessary to use TeamCityXMLParser.
         ArrayList<String> issueIds = new ArrayList<String>();
-        issueIds.add("PP-5");
+ //       issueIds.add("PP-5");
+        issueIds.add("TEST-323");
         //Act
         try {
-            Reporter reporter = new Reporter(prmsProvider, new JIRAClient(prmsProvider),new JIRAWorkflow(prmsProvider),teamCityXMLParser);
+            Reporter reporter = new Reporter(prmsProvider, new JIRAClient(prmsProvider),new JIRAWorkflow(prmsProvider),teamCityXMLParser,new JIRAProcessExceptions(_logger));
             reporter.report(issueIds);
         } catch (URISyntaxException e) {
             assertTrue(false,"There should be no exception.");
@@ -116,7 +118,7 @@ public class CodeHelperAsTest {
         issueIds.add("TEST-322");
         //Act
         try {
-            Reporter reporter = new Reporter(prmsProvider, new JIRAClient(prmsProvider),new JIRAWorkflow(prmsProvider),parser);
+            Reporter reporter = new Reporter(prmsProvider, new JIRAClient(prmsProvider),new JIRAWorkflow(prmsProvider),parser,new JIRAProcessExceptions(_logger));
             reporter.transitionIssue(issueIds);
         } catch (URISyntaxException e) {
             assertTrue(false,"There should be no exception.");

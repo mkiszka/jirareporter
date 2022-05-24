@@ -9,6 +9,7 @@ import jetbrains.buildServer.agent.BuildFinishedStatus;
 import jetbrains.buildServer.agent.BuildProcess;
 import jetbrains.buildServer.agent.BuildProgressLogger;
 import jetbrains.buildServer.agent.BuildRunnerContext;
+import name.kiszka.jirareporter.jira.JIRAProcessExceptions;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
@@ -53,7 +54,14 @@ public class JIRABuildProcess implements BuildProcess
             {
                 _logger.message("Issue ids: " + String.join(", ", issueIds));
 
-                Reporter reporter = new Reporter(_prmsProvider,new JIRAClient(_prmsProvider),new JIRAWorkflow(_prmsProvider),parser);
+                Reporter reporter = new Reporter(
+                        _prmsProvider,
+                        new JIRAClient(_prmsProvider),
+                        new JIRAWorkflow(_prmsProvider),
+                        parser,
+                        new JIRAProcessExceptions(_logger)
+                        );
+
                 reporter.report(issueIds);
                 reporter.transitionIssue(issueIds);
             }
