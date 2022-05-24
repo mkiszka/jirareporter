@@ -1,15 +1,13 @@
 package com.amirov.jirareporter.jira;
 
 import com.amirov.jirareporter.RunnerParamsProvider;
-import com.atlassian.jira.rest.client.JiraRestClient;
-import com.atlassian.jira.rest.client.NullProgressMonitor;
-import com.atlassian.jira.rest.client.domain.Comment;
-import com.atlassian.jira.rest.client.domain.Issue;
-import com.atlassian.jira.rest.client.domain.Resolution;
-import com.atlassian.jira.rest.client.domain.Transition;
-import com.atlassian.jira.rest.client.domain.input.TransitionInput;
-import com.atlassian.jira.rest.client.internal.jersey.JerseyJiraRestClientFactory;
-import com.sun.jersey.client.apache.ApacheHttpClient;
+import com.atlassian.jira.rest.client.api.JiraRestClient;
+import com.atlassian.jira.rest.client.api.JiraRestClientFactory;
+import com.atlassian.jira.rest.client.api.domain.Comment;
+import com.atlassian.jira.rest.client.api.domain.Issue;
+import com.atlassian.jira.rest.client.api.domain.Transition;
+import com.atlassian.jira.rest.client.internal.async.AsynchronousJiraRestClientFactory;
+import io.atlassian.util.concurrent.Promise;
 
 
 import java.lang.reflect.Field;
@@ -25,7 +23,7 @@ public class JIRAClient
     public JIRAClient(RunnerParamsProvider prmsProvider) throws URISyntaxException
     {
         System.setProperty("jsse.enableSNIExtension", Boolean.toString(!prmsProvider.isSslConnectionEnabled()));
-        JerseyJiraRestClientFactory factory = new JerseyJiraRestClientFactory();
+        AsynchronousJiraRestClientFactory factory = new AsynchronousJiraRestClientFactory();
         URI jiraServerUri = new URI(prmsProvider.getJiraServerUrl());
 
         if (prmsProvider.getJiraWindowsAuth())
@@ -58,7 +56,7 @@ public class JIRAClient
 
     public void addComment(Issue issue, String comment)
     {
-        _client.getIssueClient().addComment(NPM, issue.getCommentsUri(), Comment.valueOf(comment));
+        _client.getIssueClient().addComment(issue.getCommentsUri(), Comment.valueOf(comment));
     }
 
     public void makeLink(Issue issue, String url, String title)
@@ -71,8 +69,8 @@ public class JIRAClient
         return getIssue(issueId).getStatus().getName();
     }
 
-    private Iterable<Transition> getTransitions (String issueId){
-        return _client.getIssueClient().getTransitions(getIssue(issueId).getTransitionsUri(), NPM);
+    private Promise<Iterable<Transition>> getTransitions (String issueId){
+        return _client.getIssueClient().getTransitions(getIssue(issueId).getTransitionsUri());
     }
 /*
     private Transition getTransition(String transitionName){
@@ -94,7 +92,8 @@ public class JIRAClient
     }
 
     public Transition getTransitionByName(String issueId, String transitionName) {
-        Iterable<Transition> transitions = getTransitions(issueId);
+        Promise<Iterable<Transition>> transitions = getTransitions(issueId);
+        transitions.
         return getTransitionByName(transitions, transitionName);
     }
 

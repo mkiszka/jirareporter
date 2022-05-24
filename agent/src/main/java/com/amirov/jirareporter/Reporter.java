@@ -7,11 +7,14 @@ import com.amirov.jirareporter.jira.exceptions.JIRAProcessWorkflowException;
 import com.amirov.jirareporter.jira.exceptions.JIRATransitionParamsSetException;
 import com.amirov.jirareporter.teamcity.IBuildInfo;
 import com.atlassian.jira.rest.client.NullProgressMonitor;
+import com.atlassian.jira.rest.client.RestClientException;
+import com.atlassian.jira.rest.client.api.domain.Issue;
 import com.atlassian.jira.rest.client.domain.*;
 import com.atlassian.jira.rest.client.domain.input.ComplexIssueInputFieldValue;
 import com.atlassian.jira.rest.client.domain.input.FieldInput;
 import com.atlassian.jira.rest.client.domain.input.TransitionInput;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.sun.jersey.api.client.UniformInterfaceException;
 import jetbrains.buildServer.agent.BuildProgressLogger;
 
 import java.net.URISyntaxException;
@@ -44,6 +47,7 @@ public class Reporter
         {
             try {
                 _logger.message("Loading issue " + issueId);
+            try {
                 final Issue issue = _jiraClient.getIssue(issueId);
                 if (_prmsProvider.isCommentingEnabled()) {
                     _logger.message("Adding comment...");
@@ -55,9 +59,17 @@ public class Reporter
                     String title = _buildInfo.getBuildName() + " " + _buildInfo.getBuildNumber();
                     _jiraClient.makeLink(issue, _buildInfo.getWebUrl() + "&tab=artifacts", title);
                 }
+            } catch (RestClientException rse) {
+                Throwable t = rse.getCause();
+                if( t instanceof UniformInterfaceException ) {
+                    UniformInterfaceException uie = (UniformInterfaceException)t;
+                    _logger.message(uie.getMessage());
+                    if(uie.getMessage().contains("404")) {
+                        throw rse;
+                    }
 
-            }catch (Exception e) {
-                throw e;
+                }
+                _logger.message(rse.getMessage());
             }
         }
         _logger.message("Reporting completed!");

@@ -60,7 +60,7 @@
 
     <properties>
         <jackson.version>2.6.5</jackson.version>
-        <jira.restapi.version>1.0</jira.restapi.version>
+        <jira.restapi.version>5.2.4</jira.restapi.version>
         <jira.client.version>5.2.1</jira.client.version>
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
@@ -88,7 +88,7 @@
         </dependency>
         <dependency>
             <groupId>com.atlassian.jira</groupId>
-            <artifactId>jira-rest-java-client</artifactId>
+            <artifactId>jira-rest-java-client-core</artifactId>
             <version>${jira.restapi.version}</version>
         </dependency>
         <!--<dependency>

@@ -1,12 +1,11 @@
 package com.amirov.jirareporter.jira;
 
 import com.amirov.jirareporter.RunnerParamsProvider;
-import com.atlassian.jira.rest.client.AuthenticationHandler;
-import com.sun.jersey.api.client.Client;
-import com.sun.jersey.api.client.filter.Filterable;
-import com.sun.jersey.client.apache.config.ApacheHttpClientConfig;
+import com.atlassian.httpclient.api.Request;
+
+import com.atlassian.jira.rest.client.api.AuthenticationHandler;
 import jetbrains.buildServer.agent.BuildProgressLogger;
-import org.apache.http.auth.AuthScope;
+import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
@@ -47,12 +46,7 @@ public class NTLMAuthenticationHandler implements AuthenticationHandler {
     }
 
     @Override
-    public void configure(ApacheHttpClientConfig clientConfig) {
-        //_logger.message("[NTLMAuthenticationHandler] domain: " + _domain + ", user: " + _username + ", hostname: " + _hostname);
-        clientConfig.getState().setCredentials(AuthScope.ANY_REALM, AuthScope.ANY_HOST, AuthScope.ANY_PORT, _username, _password, _domain, _hostname);
-        clientConfig.getProperties().put(ApacheHttpClientConfig.PROPERTY_PREEMPTIVE_AUTHENTICATION, true);
+    public void configure(Request.Builder builder) {
+        throw new NotImplementedException();
     }
-
-    @Override
-    public void configure(Filterable filterable, Client client) { }
 }
