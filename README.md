@@ -1,3 +1,5 @@
+This plug-in doesn't work with JIRA Cloud. It needs to be refactored from using [Jira Rest Java Client](https://mvnrepository.com/artifact/com.atlassian.jira/jira-rest-java-client) to [JIRA REST Java Client Implementation](https://mvnrepository.com/artifact/com.atlassian.jira/jira-rest-java-client-core).
+
 Plug-in is designed for sending build results from TeamCity in JIRA ticket and it is also possible to move the issue through your workflow. Report are sent as comments to the issue.
 
 [Download plugin](https://github.com/mkiszka/jirareporter/releases)
