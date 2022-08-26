@@ -83,8 +83,9 @@ public class Reporter
 
                         transitionDefinitions = _jiraWorkflow.prepareJiraWorkflow(_buildInfo.getBuildStatus());
                         if(transitionDefinitions != null) {
+                            _logger.message("Transition definition was found for  " + _buildInfo.getBuildStatus());
                             for (String statusName: transitionDefinitions.keySet()  ) {
-
+                                    _logger.message("Transition for  " + statusName + " has been started");
                                     if (statusName.equals(issue.getStatus().getName())) {
                                         JIRATransitionParams transitionParams = transitionDefinitions.get(statusName);
                                         String transitionName = transitionParams.getTransitionName();
@@ -138,6 +139,8 @@ public class Reporter
                                     }
 
                             }
+                        } else {
+                            _logger.message(" Can't find any trasition definition for: " + _buildInfo.getBuildStatus());
                         }
                     } catch (RestClientException e) {
                         _jiraProcessExceptions.process(e,issueId);
