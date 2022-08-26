@@ -86,3 +86,5 @@ ${build.type.name} : ${status.build}
 ${test.results}
 Template example.
 ```
+## How to prepare package
+Run `mvn package` into main directory, then jirareporter.zip will be prepare in `./target` directory
