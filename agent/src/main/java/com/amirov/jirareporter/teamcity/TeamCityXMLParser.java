@@ -4,6 +4,7 @@ import com.amirov.jirareporter.RunnerParamsProvider;
 import jetbrains.buildServer.agent.BuildProgressLogger;
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
+import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 
@@ -92,6 +93,10 @@ public class TeamCityXMLParser implements IBuildInfo
         return loadXmlNodeList(getBuildHref(), "statusText").item(0).getTextContent();
     }
 
+    public String getBranchName(){
+        return getBuildAttribute("branchName");
+    }
+
     public String getArtifactHref()
     {
         return loadXmlNodeList(getBuildHref(), "artifacts").item(0).getAttributes().getNamedItem("href").getNodeValue();
@@ -114,6 +119,7 @@ public class TeamCityXMLParser implements IBuildInfo
                     .replace("${build.status}", getBuildStatus())
                     .replace("${build.status.style}", statusStyle)
                     .replace("${build.weburl}", getWebUrl())
+                    .replace("${build.branchName}", getBranchName())
                     .replace("${tests.results}", getBuildTestsStatus());
         else
         {
@@ -143,6 +149,11 @@ public class TeamCityXMLParser implements IBuildInfo
 
     private String getBuildAttribute(String attribute)
     {
-        return _buildData.getNamedItem(attribute).getNodeValue();
+        Node node = _buildData.getNamedItem(attribute);
+        if( node != null ) {
+            String value = node.getNodeValue();
+            if( value != null ) return value;
+        }
+        return attribute + " doesn't exist";
     }
 }

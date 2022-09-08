@@ -77,8 +77,12 @@ ${build.number}
 ${build.status}
 ${build.status.style}
 ${build.weburl}
+${build.branchName}
 ${tests.results}
 ```
+**Caution:**
+
+If TeamCity project has one brunch applied then there is no ${build.branchName} attribute. You'll see 'branchName doesn't exist' message. If you want to use 'branchName' you have to set more than one branch in TeamCity build configuration.
 
 Example:
 ```
