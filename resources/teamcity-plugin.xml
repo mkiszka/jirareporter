@@ -6,8 +6,8 @@
         <display-name>jirareporter</display-name>
         <version>${plugin.version}</version>
         <vendor>
-            <name>Stormpath</name>
-            <url>https://www.stormpath.com</url>
+            <name>Stormpath + mkiszka modification</name>
+            <url>https://github.com/mkiszka/jirareporter</url>
         </vendor>
     </info>
     <deployment use-separate-classloader="false"/>
